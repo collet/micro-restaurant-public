@@ -20,7 +20,21 @@ import static org.hamcrest.Matchers.equalTo;
 
 @Testcontainers
 @SpringBootTest
-public class OrderingItemRepositoryTest extends AbstractRepositoryTest {
+public class OrderingItemRepositoryTest {
+
+    @Container
+    static MongoDBContainer mongoDBContainer = new MongoDBContainer(DockerImageName.parse("mongo:4.4.15"))
+            .withReuse(true);
+
+    @DynamicPropertySource
+    static void mongoDbProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.data.mongodb.uri", mongoDBContainer::getReplicaSetUrl);
+    }
+
+    @BeforeAll
+    static void initAll() {
+        mongoDBContainer.start();
+    }
 
     @Autowired
     OrderingItemRepository orderingItemRepository;
