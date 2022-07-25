@@ -1,4 +1,4 @@
-package fr.univcotedazur.menu.models;
+package fr.univcotedazur.dining.models;
 
 import org.springframework.data.annotation.Id;
 
@@ -12,6 +12,10 @@ public class MenuItem {
         private String shortName;
 
         private double price; // in euro
+
+        public String getId() {
+                return id;
+        }
 
         public String getFullName() {
                 return fullName;

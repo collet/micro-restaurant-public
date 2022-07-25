@@ -1,13 +1,13 @@
-package fr.univcotedazur.menu;
+package fr.univcotedazur.dining;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class MenuServiceApp {
+public class DiningServiceApp {
 
     public static void main(String[] args) {
-        SpringApplication.run(MenuServiceApp.class, args);
+        SpringApplication.run(DiningServiceApp.class, args);
     }
 
 }
