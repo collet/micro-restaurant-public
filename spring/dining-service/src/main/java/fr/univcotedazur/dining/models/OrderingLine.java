@@ -1,5 +1,7 @@
 package fr.univcotedazur.dining.models;
 
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import javax.validation.constraints.Positive;
 
 public class OrderingLine {
@@ -8,6 +10,8 @@ public class OrderingLine {
 
     @Positive
     private int howMany;
+
+    private boolean sentForPreparation;
 
     public OrderingItem getItem() {
         return item;
@@ -23,5 +27,13 @@ public class OrderingLine {
 
     public void setHowMany(int howMany) {
         this.howMany = howMany;
+    }
+
+    public boolean isSentForPreparation() {
+        return sentForPreparation;
+    }
+
+    public void setSentForPreparation(boolean sentForPreparation) {
+        this.sentForPreparation = sentForPreparation;
     }
 }
