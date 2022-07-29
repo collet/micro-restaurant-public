@@ -1,17 +1,19 @@
 package fr.univcotedazur.dining.models;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
-import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Objects;
 
+@Document
 public class Table {
 
     @Positive
     @Id
     private Long number;
+
+    private boolean taken;
 
     public Long getNumber() {
         return number;
@@ -21,4 +23,24 @@ public class Table {
         this.number = number;
     }
 
+    public boolean isTaken() {
+        return taken;
+    }
+
+    public void setTaken(boolean taken) {
+        this.taken = taken;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Table)) return false;
+        Table table = (Table) o;
+        return taken == table.taken && Objects.equals(number, table.number);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(number, taken);
+    }
 }

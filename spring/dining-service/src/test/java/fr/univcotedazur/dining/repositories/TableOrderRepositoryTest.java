@@ -47,6 +47,7 @@ class TableOrderRepositoryTest {
     @Autowired
     TableOrderRepository tableOrderRepository;
 
+    Long table1nb = 1L;
     Table table1;
     OrderingItem pizza;
     OrderingItem lasagna;
@@ -55,7 +56,7 @@ class TableOrderRepositoryTest {
     @BeforeEach
     public void setUp() {
         table1 = new Table();
-        table1.setNumber(1L);
+        table1.setNumber(table1nb);
         tableRepository.save(table1);
         pizza = new OrderingItem();
         pizza.setShortName("pizza");
@@ -73,19 +74,23 @@ class TableOrderRepositoryTest {
     @Test
     public void shouldBeNotEmpty() {
         TableOrder tableOrder = new TableOrder();
-        tableOrder.setTable(table1);
+        tableOrder.setTableNumber(table1nb);
+        table1.setTaken(true);
         tableOrder.setNumberOfCustomers(3);
         tableOrder.setOpened(LocalDateTime.now());
         TableOrder savedTableOrder = tableOrderRepository.save(tableOrder);
         assertThat(savedTableOrder.getNumberOfCustomers(), equalTo(3));
-        assertThat(savedTableOrder.getTable(), equalTo(table1));
+        assertThat(savedTableOrder.getTableNumber(), equalTo(table1nb));
+        TableOrder found = tableOrderRepository.findByTableNumber(table1nb).get(0);
+        assertThat(found,equalTo(savedTableOrder));
         assertThat(tableOrderRepository.findAll().size(), equalTo(1));
     }
 
     @Test
     public void shouldPassAnOrder() {
         TableOrder tableOrder = new TableOrder();
-        tableOrder.setTable(table1);
+        tableOrder.setTableNumber(table1nb);
+        table1.setTaken(true);
         tableOrder.setNumberOfCustomers(1);
         tableOrder.setOpened(LocalDateTime.now());
         OrderingLine line1 = new OrderingLine();
@@ -104,12 +109,41 @@ class TableOrderRepositoryTest {
 
         line1.setSentForPreparation(true);
         tableOrderRepository.save(tableOrder);
-        assertThat(tableOrderRepository.findByTable(table1).isPresent(),is(true));
+        assertThat(tableOrderRepository.findByTableNumber(table1nb).size(),equalTo(1));
 
         List<TableOrder> openTableOrders = tableOrderRepository.findOpenTableOrders();
         assertThat(openTableOrders.size(),equalTo(1));
         TableOrder openOrder = openTableOrders.get(0);
         assertThat(openOrder.getLines().stream().filter(line -> ! line.isSentForPreparation() ).count(),equalTo(2L));
+
+    }
+
+    @Test
+    public void shouldBeBilledAndReopen() {
+        TableOrder tableOrder = new TableOrder();
+        tableOrder.setTableNumber(table1nb);
+        table1.setTaken(true);
+        tableOrder.setNumberOfCustomers(1);
+        tableOrder.setOpened(LocalDateTime.now());
+        OrderingLine line1 = new OrderingLine();
+        line1.setHowMany(1);
+        line1.setItem(pizza);
+        line1.setSentForPreparation(true);
+        tableOrderRepository.save(tableOrder);
+        tableOrder.setBilled(LocalDateTime.now());
+        table1.setTaken(false);
+        tableOrderRepository.save(tableOrder);
+        assertThat(tableOrderRepository.findAll().size(), equalTo(1));
+
+        TableOrder newTableOrderOnSameTable = new TableOrder();
+        newTableOrderOnSameTable.setTableNumber(table1nb);
+        table1.setTaken(true);
+        newTableOrderOnSameTable.setNumberOfCustomers(1);
+        newTableOrderOnSameTable.setOpened(LocalDateTime.now());
+        tableOrderRepository.save(newTableOrderOnSameTable);
+        List<TableOrder> l = tableOrderRepository.findAll();
+        assertThat(tableOrderRepository.findAll().size(), equalTo(2));
+        assertThat(tableOrderRepository.findByTableNumber(table1nb).size(), equalTo(2));
 
     }
 

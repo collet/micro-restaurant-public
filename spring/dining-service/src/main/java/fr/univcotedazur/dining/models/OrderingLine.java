@@ -3,6 +3,7 @@ package fr.univcotedazur.dining.models;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.Positive;
+import java.util.Objects;
 
 public class OrderingLine {
 
@@ -35,5 +36,18 @@ public class OrderingLine {
 
     public void setSentForPreparation(boolean sentForPreparation) {
         this.sentForPreparation = sentForPreparation;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof OrderingLine)) return false;
+        OrderingLine that = (OrderingLine) o;
+        return howMany == that.howMany && sentForPreparation == that.sentForPreparation && Objects.equals(item, that.item);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(item, howMany, sentForPreparation);
     }
 }
