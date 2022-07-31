@@ -18,7 +18,7 @@ public class TableOrder {
         private Long tableNumber;
 
         @Positive
-        private int numberOfCustomers;
+        private int customersCount;
 
         @NotNull
         private LocalDateTime opened;
@@ -43,12 +43,12 @@ public class TableOrder {
                 this.tableNumber = tableNumber;
         }
 
-        public int getNumberOfCustomers() {
-                return numberOfCustomers;
+        public int getCustomersCount() {
+                return customersCount;
         }
 
-        public void setNumberOfCustomers(int numberOfCustomers) {
-                this.numberOfCustomers = numberOfCustomers;
+        public void setCustomersCount(int customersCount) {
+                this.customersCount = customersCount;
         }
 
         public LocalDateTime getOpened() {
@@ -80,11 +80,11 @@ public class TableOrder {
                 if (this == o) return true;
                 if (!(o instanceof TableOrder)) return false;
                 TableOrder that = (TableOrder) o;
-                return numberOfCustomers == that.numberOfCustomers && Objects.equals(id, that.id) && Objects.equals(tableNumber, that.tableNumber) && Objects.equals(opened, that.opened) && Objects.equals(lines, that.lines) && Objects.equals(billed, that.billed);
+                return customersCount == that.customersCount && Objects.equals(id, that.id) && Objects.equals(tableNumber, that.tableNumber) && Objects.equals(opened, that.opened) && Objects.equals(lines, that.lines) && Objects.equals(billed, that.billed);
         }
 
         @Override
         public int hashCode() {
-                return Objects.hash(id, tableNumber, numberOfCustomers, opened, lines, billed);
+                return Objects.hash(id, tableNumber, customersCount, opened, lines, billed);
         }
 }

@@ -76,10 +76,10 @@ class TableOrderRepositoryTest {
         TableOrder tableOrder = new TableOrder();
         tableOrder.setTableNumber(table1nb);
         table1.setTaken(true);
-        tableOrder.setNumberOfCustomers(3);
+        tableOrder.setCustomersCount(3);
         tableOrder.setOpened(LocalDateTime.now());
         TableOrder savedTableOrder = tableOrderRepository.save(tableOrder);
-        assertThat(savedTableOrder.getNumberOfCustomers(), equalTo(3));
+        assertThat(savedTableOrder.getCustomersCount(), equalTo(3));
         assertThat(savedTableOrder.getTableNumber(), equalTo(table1nb));
         TableOrder found = tableOrderRepository.findByTableNumber(table1nb).get(0);
         assertThat(found,equalTo(savedTableOrder));
@@ -91,7 +91,7 @@ class TableOrderRepositoryTest {
         TableOrder tableOrder = new TableOrder();
         tableOrder.setTableNumber(table1nb);
         table1.setTaken(true);
-        tableOrder.setNumberOfCustomers(1);
+        tableOrder.setCustomersCount(1);
         tableOrder.setOpened(LocalDateTime.now());
         OrderingLine line1 = new OrderingLine();
         line1.setHowMany(1);
@@ -104,7 +104,7 @@ class TableOrderRepositoryTest {
         line3.setItem(coke);
         tableOrder.setLines(List.of(line1,line2,line3));
         TableOrder savedTableOrder = tableOrderRepository.save(tableOrder);
-        assertThat(savedTableOrder.getNumberOfCustomers(), equalTo(1));
+        assertThat(savedTableOrder.getCustomersCount(), equalTo(1));
         assertThat(savedTableOrder.getLines().size(), equalTo(3));
 
         line1.setSentForPreparation(true);
@@ -123,7 +123,7 @@ class TableOrderRepositoryTest {
         TableOrder tableOrder = new TableOrder();
         tableOrder.setTableNumber(table1nb);
         table1.setTaken(true);
-        tableOrder.setNumberOfCustomers(1);
+        tableOrder.setCustomersCount(1);
         tableOrder.setOpened(LocalDateTime.now());
         OrderingLine line1 = new OrderingLine();
         line1.setHowMany(1);
@@ -138,7 +138,7 @@ class TableOrderRepositoryTest {
         TableOrder newTableOrderOnSameTable = new TableOrder();
         newTableOrderOnSameTable.setTableNumber(table1nb);
         table1.setTaken(true);
-        newTableOrderOnSameTable.setNumberOfCustomers(1);
+        newTableOrderOnSameTable.setCustomersCount(1);
         newTableOrderOnSameTable.setOpened(LocalDateTime.now());
         tableOrderRepository.save(newTableOrderOnSameTable);
         List<TableOrder> l = tableOrderRepository.findAll();
