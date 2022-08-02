@@ -1,6 +1,5 @@
 package fr.univcotedazur.dining.components;
 
-import fr.univcotedazur.dining.exceptions.AlreadyExistingTableException;
 import fr.univcotedazur.dining.exceptions.TableAlreadyTakenException;
 import fr.univcotedazur.dining.exceptions.TableOrderAlreadyBilled;
 import fr.univcotedazur.dining.models.OrderingItem;
@@ -19,7 +18,6 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -126,7 +124,7 @@ class DiningRoomTest {
     }
 
     @Test
-    void billOrderOnTable() throws Exception {
+    void billOrderOnTableOrder() throws Exception {
         TableOrder returnedOrder = diningRoom.addNewItemOnTableOrder(order1,pizza,2);
         diningRoom.sendItemsForPreparation(returnedOrder);
         returnedOrder = diningRoom.billOrderOnTable(returnedOrder);
@@ -135,7 +133,7 @@ class DiningRoomTest {
     }
 
     @Test
-    void cannotBillOrderOnTableTwice() throws Exception {
+    void cannotBillOrderOnTableOrderTwice() throws Exception {
         TableOrder returnedOrder = diningRoom.addNewItemOnTableOrder(order1,pizza,2);
         diningRoom.sendItemsForPreparation(returnedOrder);
         final TableOrder billedOrder = diningRoom.billOrderOnTable(returnedOrder);

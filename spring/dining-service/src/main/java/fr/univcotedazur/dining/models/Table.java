@@ -2,9 +2,12 @@ package fr.univcotedazur.dining.models;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import javax.validation.constraints.Positive;
 import java.util.Objects;
+
+import static org.springframework.data.mongodb.core.mapping.FieldType.INT64;
 
 @Document
 public class Table {

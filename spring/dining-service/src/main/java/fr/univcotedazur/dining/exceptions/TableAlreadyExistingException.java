@@ -1,10 +1,10 @@
 package fr.univcotedazur.dining.exceptions;
 
-public class AlreadyExistingTableException extends Exception {
+public class TableAlreadyExistingException extends Exception {
 
     private Long alreadyUsedNumber;
 
-    public AlreadyExistingTableException(Long alreadyUsedNumber) {
+    public TableAlreadyExistingException(Long alreadyUsedNumber) {
         this.alreadyUsedNumber = alreadyUsedNumber;
     }
 

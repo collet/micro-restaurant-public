@@ -19,6 +19,7 @@ import org.testcontainers.utility.DockerImageName;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -74,6 +75,7 @@ class TableOrderRepositoryTest {
     @Test
     public void shouldBeNotEmpty() {
         TableOrder tableOrder = new TableOrder();
+        tableOrder.setId(UUID.randomUUID());
         tableOrder.setTableNumber(table1nb);
         table1.setTaken(true);
         tableOrder.setCustomersCount(3);
@@ -89,6 +91,7 @@ class TableOrderRepositoryTest {
     @Test
     public void shouldPassAnOrder() {
         TableOrder tableOrder = new TableOrder();
+        tableOrder.setId(UUID.randomUUID());
         tableOrder.setTableNumber(table1nb);
         table1.setTaken(true);
         tableOrder.setCustomersCount(1);
@@ -121,6 +124,7 @@ class TableOrderRepositoryTest {
     @Test
     public void shouldBeBilledAndReopen() {
         TableOrder tableOrder = new TableOrder();
+        tableOrder.setId(UUID.randomUUID());
         tableOrder.setTableNumber(table1nb);
         table1.setTaken(true);
         tableOrder.setCustomersCount(1);
@@ -136,6 +140,7 @@ class TableOrderRepositoryTest {
         assertThat(tableOrderRepository.findAll().size(), equalTo(1));
 
         TableOrder newTableOrderOnSameTable = new TableOrder();
+        newTableOrderOnSameTable.setId(UUID.randomUUID());
         newTableOrderOnSameTable.setTableNumber(table1nb);
         table1.setTaken(true);
         newTableOrderOnSameTable.setCustomersCount(1);

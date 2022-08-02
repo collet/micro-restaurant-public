@@ -2,19 +2,22 @@ package fr.univcotedazur.dining.models;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 @Document
 public class TableOrder {
 
         @Id
-        private String id;
+        private UUID id;
 
+        @Positive
         private Long tableNumber;
 
         @Positive
@@ -27,11 +30,11 @@ public class TableOrder {
 
         private LocalDateTime billed;
 
-        public String getId() {
+        public UUID getId() {
                 return id;
         }
 
-        public void setId(String id) {
+        public void setId(UUID id) {
                 this.id = id;
         }
 

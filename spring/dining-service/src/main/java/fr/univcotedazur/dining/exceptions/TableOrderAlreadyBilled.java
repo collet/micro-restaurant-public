@@ -1,10 +1,12 @@
 package fr.univcotedazur.dining.exceptions;
 
+import java.util.UUID;
+
 public class TableOrderAlreadyBilled extends Exception {
 
     private Long tableNumber;
 
-    private String tableOrderId;
+    private UUID tableOrderId;
 
     public Long getTableNumber() {
         return tableNumber;
@@ -14,15 +16,15 @@ public class TableOrderAlreadyBilled extends Exception {
         this.tableNumber = tableNumber;
     }
 
-    public String getTableOrderId() {
+    public UUID getTableOrderId() {
         return tableOrderId;
     }
 
-    public void setTableOrderId(String tableOrderId) {
+    public void setTableOrderId(UUID tableOrderId) {
         this.tableOrderId = tableOrderId;
     }
 
-    public TableOrderAlreadyBilled(Long tableNumber, String tableOrderId) {
+    public TableOrderAlreadyBilled(Long tableNumber, UUID tableOrderId) {
         this.tableNumber = tableNumber;
         this.tableOrderId = tableOrderId;
     }

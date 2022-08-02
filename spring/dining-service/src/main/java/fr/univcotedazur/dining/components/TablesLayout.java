@@ -1,7 +1,8 @@
 package fr.univcotedazur.dining.components;
 
-import fr.univcotedazur.dining.exceptions.AlreadyExistingTableException;
+import fr.univcotedazur.dining.exceptions.TableAlreadyExistingException;
 import fr.univcotedazur.dining.exceptions.TableAlreadyTakenException;
+import fr.univcotedazur.dining.exceptions.TableIdNotFoundException;
 import fr.univcotedazur.dining.models.Table;
 import fr.univcotedazur.dining.repositories.TableRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +17,9 @@ public class TablesLayout { // No actual layout here, just the repo for the tabl
     @Autowired
     private TableRepository tableRepository;
 
-    public Table addTable(Long number) throws AlreadyExistingTableException {
+    public Table addTable(Long number) throws TableAlreadyExistingException {
         if (isValidTable(number)) {
-            throw new AlreadyExistingTableException(number);
+            throw new TableAlreadyExistingException(number);
         } else {
             Table newTable = new Table();
             newTable.setNumber(number);
@@ -28,6 +29,14 @@ public class TablesLayout { // No actual layout here, just the repo for the tabl
 
     public boolean isValidTable(Long number) {
         return tableRepository.existsById(number);
+    }
+
+    public Table retrieveTable(Long tableId) throws TableIdNotFoundException {
+        Optional<Table> optTable = findByNumber(tableId);
+        if (optTable.isEmpty()) {
+            throw new TableIdNotFoundException(tableId);
+        }
+        return optTable.get();
     }
 
     public Table takeTable(Table table) throws TableAlreadyTakenException {

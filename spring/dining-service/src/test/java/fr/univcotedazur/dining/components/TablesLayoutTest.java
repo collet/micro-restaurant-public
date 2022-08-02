@@ -1,6 +1,6 @@
 package fr.univcotedazur.dining.components;
 
-import fr.univcotedazur.dining.exceptions.AlreadyExistingTableException;
+import fr.univcotedazur.dining.exceptions.TableAlreadyExistingException;
 import fr.univcotedazur.dining.models.Table;
 import fr.univcotedazur.dining.repositories.TableRepository;
 import org.junit.jupiter.api.Test;
@@ -8,8 +8,6 @@ import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-
-import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -38,7 +36,7 @@ class TablesLayoutTest {
     @Test
     void addTableWithExceptionWhenTableAlreadyExists() throws Exception {
         when(tableRepository.existsById(anyLong())).thenReturn(true);
-        assertThrows(AlreadyExistingTableException.class, () -> tablesLayout.addTable(1L));
+        assertThrows(TableAlreadyExistingException.class, () -> tablesLayout.addTable(1L));
     }
 
 }

@@ -1,8 +1,6 @@
 package fr.univcotedazur.dining.components;
 
-import fr.univcotedazur.dining.exceptions.TableAlreadyTakenException;
-import fr.univcotedazur.dining.exceptions.TableNotTakenException;
-import fr.univcotedazur.dining.exceptions.TableOrderAlreadyBilled;
+import fr.univcotedazur.dining.exceptions.*;
 import fr.univcotedazur.dining.models.OrderingItem;
 import fr.univcotedazur.dining.models.OrderingLine;
 import fr.univcotedazur.dining.models.Table;
@@ -14,6 +12,8 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Component
 public class DiningRoom {
@@ -27,10 +27,23 @@ public class DiningRoom {
     public TableOrder startOrderingOnTable(Table table, int customerCount) throws TableAlreadyTakenException {
         Table takenTable = tablesLayout.takeTable(table);
         TableOrder tableOrder = new TableOrder();
+        tableOrder.setId(UUID.randomUUID());
         tableOrder.setTableNumber(takenTable.getNumber());
         tableOrder.setCustomersCount(customerCount);
         tableOrder.setOpened(LocalDateTime.now());
         return tableOrderRepository.save(tableOrder);
+    }
+
+    public Optional<TableOrder> findById(UUID tableOrderId) {
+        return tableOrderRepository.findById(tableOrderId);
+    }
+
+    public TableOrder retrieveTableOrder(UUID tableOrderId) throws TableOrderIdNotFoundException {
+        Optional<TableOrder> optTableOrder = findById(tableOrderId);
+        if (optTableOrder.isEmpty()) {
+            throw new TableOrderIdNotFoundException(tableOrderId);
+        }
+        return optTableOrder.get();
     }
 
     public TableOrder currentTableOrderOnTable(Table table) throws TableNotTakenException {
@@ -40,6 +53,10 @@ public class DiningRoom {
             return tableOrderRepository.findOpenTableOrders().stream()
                     .filter(tOrder -> tOrder.getBilled() == null).findFirst().get();
         }
+    }
+
+    public List<TableOrder> findAllOpenTableOrders() {
+        return tableOrderRepository.findOpenTableOrders();
     }
 
     public TableOrder billOrderOnTable(TableOrder tableOrder) throws TableOrderAlreadyBilled {

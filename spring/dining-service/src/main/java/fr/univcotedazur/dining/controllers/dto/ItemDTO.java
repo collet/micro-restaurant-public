@@ -1,17 +1,20 @@
-package fr.univcotedazur.dining.models;
+package fr.univcotedazur.dining.controllers.dto;
 
 import org.springframework.data.annotation.Id;
 
 import javax.validation.constraints.NotBlank;
-import java.util.Objects;
+import javax.validation.constraints.Positive;
 
-public class OrderingItem {
+public class ItemDTO {
 
     @Id
     private String id; // id of the item from the menu
 
     @NotBlank
     private String shortName;
+
+    @Positive
+    private int howMany;
 
     public String getId() {
         return id;
@@ -29,18 +32,12 @@ public class OrderingItem {
         this.shortName = shortName;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof OrderingItem)) return false;
-        OrderingItem that = (OrderingItem) o;
-        return Objects.equals(id, that.id) && Objects.equals(shortName, that.shortName);
+    public int getHowMany() {
+        return howMany;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, shortName);
+    public void setHowMany(int howMany) {
+        this.howMany = howMany;
     }
-
 
 }
