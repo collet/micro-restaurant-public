@@ -2,10 +2,12 @@ package fr.univcotedazur.dining.models;
 
 import org.springframework.data.annotation.Id;
 
+import java.util.UUID;
+
 public class MenuItem {
 
         @Id
-        private String id;
+        private UUID id;
 
         private String fullName;
 
@@ -13,8 +15,12 @@ public class MenuItem {
 
         private double price; // in euro
 
-        public String getId() {
+        public UUID getId() {
                 return id;
+        }
+
+        public void setId(UUID id) {
+                this.id = id;
         }
 
         public String getFullName() {
