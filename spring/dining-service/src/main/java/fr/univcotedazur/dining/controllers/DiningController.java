@@ -1,6 +1,7 @@
 package fr.univcotedazur.dining.controllers;
 
 import fr.univcotedazur.dining.components.DiningRoom;
+import fr.univcotedazur.dining.components.MenuProxy;
 import fr.univcotedazur.dining.components.TablesLayout;
 import fr.univcotedazur.dining.controllers.dto.SentDTO;
 import fr.univcotedazur.dining.controllers.dto.StartOrderingDTO;
@@ -36,6 +37,9 @@ public class DiningController {
     @Autowired
     private TablesLayout tablesLayout;
 
+    @Autowired
+    private MenuProxy menuProxy;
+
     @PostMapping
     public ResponseEntity<TableOrder> openTable(@RequestBody @Valid StartOrderingDTO startOrderingDTO)
             throws TableIdNotFoundException, TableAlreadyTakenException {
@@ -52,6 +56,7 @@ public class DiningController {
     public ResponseEntity<TableOrder> addToTableOrder(@PathVariable("tableOrderId") UUID tableOrderId, @RequestBody ItemDTO itemDTO)
             throws TableOrderIdNotFoundException, TableOrderAlreadyBilled {
         TableOrder tableOrder = diningRoom.retrieveTableOrder(tableOrderId);
+        // TODO menuProxy.findByShortName(itemDTO.getShortName());
         OrderingItem orderingItem = new OrderingItem();
         orderingItem.setId(itemDTO.getId());
         orderingItem.setShortName(itemDTO.getShortName());

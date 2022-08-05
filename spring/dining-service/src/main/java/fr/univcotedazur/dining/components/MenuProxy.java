@@ -28,6 +28,7 @@ public class MenuProxy {
     }
 
     private void populateMenuItemMapIfNeeded() {
+        System.err.println("###################### acessing menus from the dining service #################");
         if (menuItemMap == null) {
             OrderingItem[] menuItems = restTemplate.getForEntity(menuHostandPort+"/menus", OrderingItem[].class).getBody();
             menuItemMap = new HashMap<>(menuItems.length * 4 / 3);
