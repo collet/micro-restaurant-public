@@ -24,6 +24,9 @@ public class DiningRoom {
     @Autowired
     private TablesLayout tablesLayout;
 
+    @Autowired
+    private MenuProxy menuProxy;
+
     public TableOrder startOrderingOnTable(Table table, int customerCount) throws TableAlreadyTakenException {
         Table takenTable = tablesLayout.takeTable(table);
         TableOrder tableOrder = new TableOrder();

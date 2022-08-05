@@ -42,7 +42,7 @@ class TableRepositoryTest {
     @Autowired
     TableRepository tableRepository;
 
-    @AfterEach
+    @BeforeEach // to remove table from the startup logic
     void tearDown() {
         tableRepository.deleteAll();
     }

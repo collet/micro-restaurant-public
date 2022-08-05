@@ -1,15 +1,15 @@
 version: "3"
 
 services:
-  menu_service:
+  menu-service:
     image: "restaurant/menu-service"
     restart: always
     ports:
-      - 8080:8080
+      - 3000:8080
     depends_on:
       - mongo_db_menu
   mongo_db_menu:
-    image: "mongo:4.4.15"
+    image: ${MONGO_IMAGE}
     restart: always
     ports:
       - 27017:27017

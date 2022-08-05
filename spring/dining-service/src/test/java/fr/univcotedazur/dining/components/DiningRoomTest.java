@@ -51,7 +51,7 @@ class DiningRoomTest {
     @Autowired
     DiningRoom diningRoom;
 
-    Long table1nb = 1L;
+    Long table1nb = 124L;
     Table table1;
     OrderingItem pizza;
     OrderingItem lasagna;
@@ -62,7 +62,6 @@ class DiningRoomTest {
     public void setUp() throws Exception {
         table1 = new Table();
         table1.setNumber(table1nb);
-        tableRepository.save(table1);
         pizza = new OrderingItem();
         pizza.setShortName("pizza");
         lasagna = new OrderingItem();

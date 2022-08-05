@@ -56,10 +56,10 @@ public class TableControllerTest {
     void setUp() {
         RestAssuredMockMvc.mockMvc(mockMvc);
         table1 = new TableCreationDTO();
-        table1.setTableId(1L);
+        table1.setTableId(124L);
     }
 
-    @AfterEach
+    @BeforeEach // to remove table from the startup logic
     void tearDown() {
         tableRepository.deleteAll();
     }
@@ -72,7 +72,7 @@ public class TableControllerTest {
                 .post(BASE_URI).
                 then()
                 .statusCode(HttpStatus.SC_CREATED)
-                .body("number", is(1)) // Rest Assured parsed back an int, not a long
+                .body("number", is(124)) // Rest Assured parsed back an int, not a long
                 .body("taken", is(false));
         given()
                 .contentType(ContentType.JSON).body(table1).
@@ -91,7 +91,7 @@ public class TableControllerTest {
                 then()
                 .statusCode(HttpStatus.SC_CREATED);
         TableCreationDTO table2 = new TableCreationDTO();
-        table2.setTableId(2L);
+        table2.setTableId(125L);
         given()
                 .contentType(ContentType.JSON).body(table2).
                 when()

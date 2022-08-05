@@ -62,6 +62,7 @@ public class DiningControllerTest {
     private TableOrderRepository tableOrderRepository;
 
     TableCreationDTO table1;
+    Long table1Id = 124L;
     StartOrderingDTO order1;
     ItemDTO twoPizzas;
     ItemDTO oneLasagna;
@@ -71,7 +72,7 @@ public class DiningControllerTest {
     void setUp() {
         RestAssuredMockMvc.mockMvc(mockMvc);
         table1 = new TableCreationDTO();
-        table1.setTableId(1L);
+        table1.setTableId(table1Id);
         given()
                 .contentType(ContentType.JSON).body(table1).
                 when()
@@ -79,7 +80,7 @@ public class DiningControllerTest {
                 then()
                 .statusCode(HttpStatus.SC_CREATED);
         order1 = new StartOrderingDTO();
-        order1.setTableId(1L);
+        order1.setTableId(table1Id);
         order1.setCustomersCount(4);
         twoPizzas = new ItemDTO();
         // We don't set Item Id for tests
@@ -109,7 +110,7 @@ public class DiningControllerTest {
                 then()
                 .statusCode(HttpStatus.SC_CREATED)
                 .body("id", notNullValue())
-                .body("tableNumber", is(1))
+                .body("tableNumber", is(table1Id.intValue()))
                 .body("customersCount", is(4))
                 .body("opened", notNullValue())
                 .body("billed", nullValue());

@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice(assignableTypes = {DiningController.class,TableController.class})
-public class GlobalControllerAdvice {
+public class DiningControllerAdvice {
 
     @ExceptionHandler({TableAlreadyExistingException.class})
     @ResponseStatus(HttpStatus.CONFLICT)

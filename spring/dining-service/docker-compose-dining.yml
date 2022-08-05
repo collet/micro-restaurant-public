@@ -1,15 +1,18 @@
 version: "3"
 
 services:
-  menu_service:
+  dining-service:
     image: "restaurant/dining-service"
     restart: always
     ports:
-      - 8080:8080
+      - 3001:8080
     depends_on:
       - mongo_db_dining
+      - ${MENU_SERVICE}
+    environment:
+      - MENU_WITH_PORT=${MENU_SERVICE}:8080
   mongo_db_dining:
-    image: "mongo:4.4.15"
+    image: ${MONGO_IMAGE}
     restart: always
     ports:
       - 27018:27017

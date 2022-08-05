@@ -1,7 +1,7 @@
-package fr.univcotedazur.dining;
+package fr.univcotedazur.menus;
 
-import fr.univcotedazur.dining.models.MenuItem;
-import fr.univcotedazur.dining.repositories.MenuItemRepository;
+import fr.univcotedazur.menus.models.MenuItem;
+import fr.univcotedazur.menus.repositories.MenuItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;

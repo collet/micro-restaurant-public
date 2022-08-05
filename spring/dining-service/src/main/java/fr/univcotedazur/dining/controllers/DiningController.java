@@ -24,12 +24,11 @@ import java.util.UUID;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
-
 @RestController
 @RequestMapping(path = DiningController.BASE_URI, produces = APPLICATION_JSON_VALUE)
 public class DiningController {
 
-    public static final String BASE_URI = "/dining";
+    public static final String BASE_URI = "/tableOrders";
 
     @Autowired
     private DiningRoom diningRoom;

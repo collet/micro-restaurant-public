@@ -1,7 +1,9 @@
-package fr.univcotedazur.dining.models;
+package fr.univcotedazur.menus.models;
 
 import org.springframework.data.annotation.Id;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Positive;
 import java.util.UUID;
 
 public class MenuItem {
@@ -9,10 +11,13 @@ public class MenuItem {
         @Id
         private UUID id;
 
+        @NotBlank
         private String fullName;
 
+        @NotBlank
         private String shortName;
 
+        @Positive
         private double price; // in euro
 
         public UUID getId() {
