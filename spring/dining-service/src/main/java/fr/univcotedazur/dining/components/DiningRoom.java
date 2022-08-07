@@ -62,6 +62,10 @@ public class DiningRoom {
         return tableOrderRepository.findOpenTableOrders();
     }
 
+    public List<TableOrder> findAll() {
+        return tableOrderRepository.findAll();
+    }
+
     public TableOrder billOrderOnTable(TableOrder tableOrder) throws TableOrderAlreadyBilledException {
         if (tableOrder.getBilled() != null) {
             throw new TableOrderAlreadyBilledException(tableOrder.getTableNumber(), tableOrder.getId());

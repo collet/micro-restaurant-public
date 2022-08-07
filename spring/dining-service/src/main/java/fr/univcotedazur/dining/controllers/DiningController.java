@@ -46,8 +46,8 @@ public class DiningController {
     }
 
     @GetMapping
-    public ResponseEntity<List<TableOrder>> findAllOpenTableOrders() {
-        return ResponseEntity.ok(diningRoom.findAllOpenTableOrders());
+    public ResponseEntity<List<TableOrder>> findAllTableOrders() {
+        return ResponseEntity.ok(diningRoom.findAll());
     }
 
     @PostMapping("/{tableOrderId}")
