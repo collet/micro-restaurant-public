@@ -1,8 +1,10 @@
 package fr.univcotedazur.dining.controllers;
 
+import fr.univcotedazur.dining.components.MenuProxy;
 import fr.univcotedazur.dining.controllers.dto.ItemDTO;
 import fr.univcotedazur.dining.controllers.dto.StartOrderingDTO;
 import fr.univcotedazur.dining.controllers.dto.TableCreationDTO;
+import fr.univcotedazur.dining.models.OrderingItem;
 import fr.univcotedazur.dining.models.OrderingLine;
 import fr.univcotedazur.dining.repositories.TableOrderRepository;
 import fr.univcotedazur.dining.repositories.TableRepository;
@@ -16,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
@@ -25,6 +28,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static fr.univcotedazur.dining.controllers.DiningController.BASE_URI;
@@ -61,6 +65,9 @@ public class DiningControllerTest {
     @Autowired
     private TableOrderRepository tableOrderRepository;
 
+    @MockBean
+    private MenuProxy mockedMenuProxy;
+
     TableCreationDTO table1;
     Long table1Id = 124L;
     StartOrderingDTO order1;
@@ -83,15 +90,30 @@ public class DiningControllerTest {
         order1.setTableId(table1Id);
         order1.setCustomersCount(4);
         twoPizzas = new ItemDTO();
-        // We don't set Item Id for tests
         twoPizzas.setShortName("pizza");
+        twoPizzas.setId("ID1");
         twoPizzas.setHowMany(2);
         oneLasagna = new ItemDTO();
         oneLasagna.setShortName("lasagna");
+        oneLasagna.setId("ID2");
         oneLasagna.setHowMany(1);
         threeCokes = new ItemDTO();
         threeCokes.setShortName("coke");
+        threeCokes.setId("ID3");
         threeCokes.setHowMany(3);
+        OrderingItem mockPizza = new OrderingItem();
+        mockPizza.setShortName(twoPizzas.getShortName());
+        mockPizza.setId(twoPizzas.getId());
+        OrderingItem mockLasagna = new OrderingItem();
+        mockLasagna.setShortName(oneLasagna.getShortName());
+        mockLasagna.setId(oneLasagna.getId());
+        OrderingItem mockCoke = new OrderingItem();
+        mockCoke.setShortName(threeCokes.getShortName());
+        mockCoke.setId(threeCokes.getId());
+        org.mockito.Mockito.when(mockedMenuProxy.findByShortName(org.mockito.Mockito.anyString())).
+                thenReturn(Optional.of(mockPizza)).
+                thenReturn(Optional.of(mockCoke)).
+                thenReturn(Optional.of(mockLasagna));
     }
 
 
@@ -228,7 +250,7 @@ public class DiningControllerTest {
                 then()
                 .statusCode(HttpStatus.SC_UNPROCESSABLE_ENTITY);
         given()
-                .contentType(ContentType.JSON).body(oneLasagna).
+                .contentType(ContentType.JSON).body(threeCokes).
                 when()
                 .post(BASE_URI + "/" + orderId).
                 then()

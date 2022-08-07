@@ -6,10 +6,7 @@ import fr.univcotedazur.dining.components.TablesLayout;
 import fr.univcotedazur.dining.controllers.dto.SentDTO;
 import fr.univcotedazur.dining.controllers.dto.StartOrderingDTO;
 import fr.univcotedazur.dining.controllers.dto.ItemDTO;
-import fr.univcotedazur.dining.exceptions.TableAlreadyTakenException;
-import fr.univcotedazur.dining.exceptions.TableIdNotFoundException;
-import fr.univcotedazur.dining.exceptions.TableOrderAlreadyBilled;
-import fr.univcotedazur.dining.exceptions.TableOrderIdNotFoundException;
+import fr.univcotedazur.dining.exceptions.*;
 import fr.univcotedazur.dining.models.OrderingItem;
 import fr.univcotedazur.dining.models.Table;
 import fr.univcotedazur.dining.models.TableOrder;
@@ -21,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -54,14 +52,20 @@ public class DiningController {
 
     @PostMapping("/{tableOrderId}")
     public ResponseEntity<TableOrder> addToTableOrder(@PathVariable("tableOrderId") UUID tableOrderId, @RequestBody ItemDTO itemDTO)
-            throws TableOrderIdNotFoundException, TableOrderAlreadyBilled {
+            throws TableOrderIdNotFoundException, TableOrderAlreadyBilledException, ItemDTONotFoundException {
         TableOrder tableOrder = diningRoom.retrieveTableOrder(tableOrderId);
-        // TODO menuProxy.findByShortName(itemDTO.getShortName());
-        OrderingItem orderingItem = new OrderingItem();
-        orderingItem.setId(itemDTO.getId());
-        orderingItem.setShortName(itemDTO.getShortName());
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(diningRoom.addNewItemOnTableOrder(tableOrder, orderingItem, itemDTO.getHowMany()));
+        Optional<OrderingItem> orderingItemOpt =  menuProxy.findByShortName(itemDTO.getShortName());
+        if (orderingItemOpt.isEmpty()) {
+            throw new ItemDTONotFoundException(itemDTO);
+        } else {
+            OrderingItem orderingItem = orderingItemOpt.get();
+            if (!orderingItem.getId().equals(itemDTO.getId())) {
+                throw new ItemDTONotFoundException(itemDTO);
+            } else {
+                return ResponseEntity.status(HttpStatus.CREATED)
+                        .body(diningRoom.addNewItemOnTableOrder(tableOrder, orderingItem, itemDTO.getHowMany()));
+            }
+        }
     }
 
     @GetMapping("/{tableOrderId}")
@@ -81,7 +85,7 @@ public class DiningController {
 
     @PostMapping("/{tableOrderId}/bill")
     public ResponseEntity<TableOrder> bill(@PathVariable("tableOrderId") UUID tableOrderId)
-            throws TableOrderIdNotFoundException, TableOrderAlreadyBilled {
+            throws TableOrderIdNotFoundException, TableOrderAlreadyBilledException {
         TableOrder tableOrder = diningRoom.retrieveTableOrder(tableOrderId);
         return ResponseEntity.ok(diningRoom.billOrderOnTable(tableOrder));
     }

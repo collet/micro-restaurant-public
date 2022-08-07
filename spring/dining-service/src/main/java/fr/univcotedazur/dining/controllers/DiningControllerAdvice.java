@@ -46,13 +46,25 @@ public class DiningControllerAdvice {
         return errorDTO;
     }
 
-    @ExceptionHandler({TableOrderAlreadyBilled.class})
+    @ExceptionHandler({TableOrderAlreadyBilledException.class})
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
-    public ErrorDTO handleExceptions(TableOrderAlreadyBilled e)  {
+    public ErrorDTO handleExceptions(TableOrderAlreadyBilledException e)  {
         ErrorDTO errorDTO = new ErrorDTO();
         errorDTO.setError("TableOrder is already billed");
         errorDTO.setDetails(e.getTableOrderId() + " is the Id of a tableOrder (on table " +
                 e.getTableNumber() + ") already billed");
         return errorDTO;
     }
+
+    @ExceptionHandler({ItemDTONotFoundException.class})
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorDTO handleExceptions(ItemDTONotFoundException e)  {
+        ErrorDTO errorDTO = new ErrorDTO();
+        errorDTO.setError("Inconsistent ItemDTO with the MenuServiceProxy");
+        errorDTO.setDetails(e.getItemDTONotCorrespondingtoMenuItem().getId() + " is not a valid MenuItem Id or " +
+                e.getItemDTONotCorrespondingtoMenuItem().getShortName() +
+                "is not a valid MenuItem short name or the pair Id/shortname is not consistent with the MenuItem");
+        return errorDTO;
+    }
+
 }

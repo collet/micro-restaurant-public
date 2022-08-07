@@ -2,7 +2,7 @@ package fr.univcotedazur.dining.exceptions;
 
 import java.util.UUID;
 
-public class TableOrderAlreadyBilled extends Exception {
+public class TableOrderAlreadyBilledException extends Exception {
 
     private Long tableNumber;
 
@@ -24,7 +24,7 @@ public class TableOrderAlreadyBilled extends Exception {
         this.tableOrderId = tableOrderId;
     }
 
-    public TableOrderAlreadyBilled(Long tableNumber, UUID tableOrderId) {
+    public TableOrderAlreadyBilledException(Long tableNumber, UUID tableOrderId) {
         this.tableNumber = tableNumber;
         this.tableOrderId = tableOrderId;
     }

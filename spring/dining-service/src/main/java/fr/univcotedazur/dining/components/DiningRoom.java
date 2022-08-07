@@ -62,9 +62,9 @@ public class DiningRoom {
         return tableOrderRepository.findOpenTableOrders();
     }
 
-    public TableOrder billOrderOnTable(TableOrder tableOrder) throws TableOrderAlreadyBilled {
+    public TableOrder billOrderOnTable(TableOrder tableOrder) throws TableOrderAlreadyBilledException {
         if (tableOrder.getBilled() != null) {
-            throw new TableOrderAlreadyBilled(tableOrder.getTableNumber(), tableOrder.getId());
+            throw new TableOrderAlreadyBilledException(tableOrder.getTableNumber(), tableOrder.getId());
         } else {
             tableOrder.setBilled(LocalDateTime.now());
             System.err.println("TODO: send payment for the tableOrder" + tableOrder.getId() + " on table " +
@@ -73,9 +73,9 @@ public class DiningRoom {
         }
     }
 
-    public TableOrder addNewItemOnTableOrder(TableOrder tableOrder, OrderingItem item, int howMany) throws TableOrderAlreadyBilled {
+    public TableOrder addNewItemOnTableOrder(TableOrder tableOrder, OrderingItem item, int howMany) throws TableOrderAlreadyBilledException {
         if (tableOrder.getBilled() != null) {
-            throw new TableOrderAlreadyBilled(tableOrder.getTableNumber(), tableOrder.getId());
+            throw new TableOrderAlreadyBilledException(tableOrder.getTableNumber(), tableOrder.getId());
         } else {
             OrderingLine line = new OrderingLine();
             line.setItem(item);

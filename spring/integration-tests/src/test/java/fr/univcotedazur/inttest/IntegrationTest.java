@@ -1,6 +1,6 @@
 package fr.univcotedazur.inttest;
 
-import io.restassured.RestAssured;
+import fr.univcotedazur.inttest.dto.MenuItemDTO;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
@@ -9,13 +9,14 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class IntegrationTest {
@@ -24,6 +25,7 @@ class IntegrationTest {
     RequestSpecification diningSpec;
     final static String TABLES = "/tables";
     final static String ORDERS = "/tableOrders";
+    Map<String,UUID> menuItemDTOMap;
 
     @BeforeEach
     public void configureRestAssured() {
@@ -33,6 +35,18 @@ class IntegrationTest {
         diningSpec = new RequestSpecBuilder().
                 setAccept(ContentType.JSON).setContentType(ContentType.JSON).
                 setBaseUri("http://localhost:3001").build();
+        List<MenuItemDTO> menuItemDTOList =
+                given()
+                        .spec(menusSpec).
+                        when().
+                        get().
+                        then()
+                        .statusCode(HttpStatus.SC_OK)
+                        .extract().jsonPath().getList("",MenuItemDTO.class);
+        menuItemDTOMap = new HashMap<>();
+        for (MenuItemDTO m : menuItemDTOList) {
+            menuItemDTOMap.put(m.getShortName(),m.getId());
+        }
     }
 
     @Test
@@ -80,6 +94,7 @@ class IntegrationTest {
                 .extract().jsonPath().getUUID("id");
         JSONObject ordering2pizzas = new JSONObject();
         ordering2pizzas.put("shortName","pizza");
+        ordering2pizzas.put("id", menuItemDTOMap.get("pizza").toString());
         ordering2pizzas.put("howMany", "2");
         given()
                 .spec(diningSpec)
@@ -91,6 +106,7 @@ class IntegrationTest {
                 .body("id", equalTo(orderId.toString()));
         JSONObject ordering3cokes = new JSONObject();
         ordering3cokes.put("shortName","coke");
+        ordering3cokes.put("id", menuItemDTOMap.get("coke").toString());
         ordering3cokes.put("howMany", "3");
         given()
                 .spec(diningSpec)

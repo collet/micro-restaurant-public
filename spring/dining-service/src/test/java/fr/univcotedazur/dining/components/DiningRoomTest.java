@@ -1,7 +1,7 @@
 package fr.univcotedazur.dining.components;
 
 import fr.univcotedazur.dining.exceptions.TableAlreadyTakenException;
-import fr.univcotedazur.dining.exceptions.TableOrderAlreadyBilled;
+import fr.univcotedazur.dining.exceptions.TableOrderAlreadyBilledException;
 import fr.univcotedazur.dining.models.OrderingItem;
 import fr.univcotedazur.dining.models.OrderingLine;
 import fr.univcotedazur.dining.models.Table;
@@ -103,7 +103,7 @@ class DiningRoomTest {
     @Test
     void cannotAddNewItemOnOrderAlreadyBilled() throws Exception {
         diningRoom.billOrderOnTable(order1);
-        assertThrows(TableOrderAlreadyBilled.class, () -> diningRoom.addNewItemOnTableOrder(order1,pizza,1));
+        assertThrows(TableOrderAlreadyBilledException.class, () -> diningRoom.addNewItemOnTableOrder(order1,pizza,1));
     }
 
     @Test
@@ -136,7 +136,7 @@ class DiningRoomTest {
         TableOrder returnedOrder = diningRoom.addNewItemOnTableOrder(order1,pizza,2);
         diningRoom.sendItemsForPreparation(returnedOrder);
         final TableOrder billedOrder = diningRoom.billOrderOnTable(returnedOrder);
-        assertThrows(TableOrderAlreadyBilled.class, () -> diningRoom.billOrderOnTable(billedOrder));
+        assertThrows(TableOrderAlreadyBilledException.class, () -> diningRoom.billOrderOnTable(billedOrder));
     }
 
 }
