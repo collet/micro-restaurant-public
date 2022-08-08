@@ -32,10 +32,6 @@ public class DiningStartUpLogic implements ApplicationRunner {
             tablesLayout.addTable(2L);
             tablesLayout.addTable(3L);
         }
-        /*System.err.println("waiting 10s");
-        Thread.sleep(10000);
-        List<OrderingItem> itemList = menuProxy.findAll();
-        System.err.println("Retrieving " + itemList.size() + " menuItems from the menu service");*/
     }
 
 
