@@ -21,7 +21,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>17</java.version>
-        <cucumber.version>7.4.1</cucumber.version>
         <junit.platform.version>1.8.2</junit.platform.version>
         <maven.plugins.version>3.0.0-M7</maven.plugins.version>
         <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
