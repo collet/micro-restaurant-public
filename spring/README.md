@@ -55,7 +55,7 @@ Each service is dockerized with its DB. The following scripts are provided:
 The overall build and run of all services (+ the integration testing service) are managed through the following scripts:
 * `build-all.sh` runs the build in each service (except testing services)
 * `run-local-integrationtest.sh` compiles and runs the integration tests (without prior building of the services), starting and stopping all the services
-* `start-all.sh` runs all the service with a single docker-compose
+* `start-all.sh` runs all the service with a single docker-compose (**and enables to see the swagger doc**)
 * `stop-all.sh` puts down the previous composition
 
 
