@@ -1,0 +1,15 @@
+version: "3"
+
+services:
+  kitchen-service:
+    image: "restaurant/kitchen-service"
+    restart: always
+    ports:
+      - 3002:8080
+    depends_on:
+      - mongo_db_kitchen
+  mongo_db_kitchen:
+    image: ${MONGO_IMAGE}
+    restart: always
+    ports:
+      - 27019:27017

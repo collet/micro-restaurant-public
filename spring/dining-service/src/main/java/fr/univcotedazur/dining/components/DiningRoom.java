@@ -1,5 +1,7 @@
 package fr.univcotedazur.dining.components;
 
+import fr.univcotedazur.dining.models.CookedItem;
+import fr.univcotedazur.dining.components.dto.ItemsToBeCookedInKitchen;
 import fr.univcotedazur.dining.exceptions.*;
 import fr.univcotedazur.dining.models.OrderingItem;
 import fr.univcotedazur.dining.models.OrderingLine;
@@ -25,7 +27,7 @@ public class DiningRoom {
     private TablesLayout tablesLayout;
 
     @Autowired
-    private MenuProxy menuProxy;
+    private KitchenProxy kitchenProxy;
 
     public TableOrder startOrderingOnTable(Table table, int customerCount) throws TableAlreadyTakenException {
         Table takenTable = tablesLayout.takeTable(table);
@@ -95,21 +97,22 @@ public class DiningRoom {
         }
     }
 
-    public int sendItemsForPreparation(TableOrder tableOrder) {
-        int howManyItemsSent = 0;
+    public List<CookedItem> sendItemsForPreparation(TableOrder tableOrder) {
         ArrayList<OrderingLine> updatedLines = new ArrayList<>();
+        ArrayList<CookedItem> cookedItemDTOs = new ArrayList<>();
         for (OrderingLine line : tableOrder.getLines()) {
             if (!line.isSentForPreparation()) {
-                howManyItemsSent += line.getHowMany();
-                System.err.println("TODO: send " + line.getHowMany() + " " + line.getItem().getShortName() +
-                        " to the right proxy component to kitchen or bar");
+                ItemsToBeCookedInKitchen itemsToBeCookedInKitchen = new ItemsToBeCookedInKitchen();
+                itemsToBeCookedInKitchen.setShortName(line.getItem().getShortName());
+                itemsToBeCookedInKitchen.setHowMany(line.getHowMany());
+                cookedItemDTOs.addAll(kitchenProxy.sendCookingOrderToKitchen(itemsToBeCookedInKitchen));
                 line.setSentForPreparation(true);
             }
             updatedLines.add(line);
         }
         tableOrder.setLines(updatedLines);
         tableOrderRepository.save(tableOrder);
-        return howManyItemsSent;
+        return cookedItemDTOs;
     }
 
 }

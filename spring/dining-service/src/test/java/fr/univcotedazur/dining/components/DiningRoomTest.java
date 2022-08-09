@@ -1,16 +1,15 @@
 package fr.univcotedazur.dining.components;
 
+import fr.univcotedazur.dining.components.dto.ItemsToBeCookedInKitchen;
 import fr.univcotedazur.dining.exceptions.TableAlreadyTakenException;
 import fr.univcotedazur.dining.exceptions.TableOrderAlreadyBilledException;
-import fr.univcotedazur.dining.models.OrderingItem;
-import fr.univcotedazur.dining.models.OrderingLine;
-import fr.univcotedazur.dining.models.Table;
-import fr.univcotedazur.dining.models.TableOrder;
+import fr.univcotedazur.dining.models.*;
 import fr.univcotedazur.dining.repositories.TableOrderRepository;
 import fr.univcotedazur.dining.repositories.TableRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.MongoDBContainer;
@@ -18,11 +17,15 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @Testcontainers
 @SpringBootTest
@@ -51,6 +54,9 @@ class DiningRoomTest {
     @Autowired
     DiningRoom diningRoom;
 
+    @MockBean
+    KitchenProxy mockedKitchenProxy;
+
     Long table1nb = 124L;
     Table table1;
     OrderingItem pizza;
@@ -69,6 +75,11 @@ class DiningRoomTest {
         coke = new OrderingItem();
         coke.setShortName("coke");
         order1 = diningRoom.startOrderingOnTable(table1,3);
+        CookedItem fakeCookedItem = new CookedItem();
+        fakeCookedItem.setId(UUID.randomUUID());
+        fakeCookedItem.setReadyToServe(LocalDateTime.now());
+        when(mockedKitchenProxy.sendCookingOrderToKitchen(any(ItemsToBeCookedInKitchen.class))).
+                thenReturn(List.of(fakeCookedItem,fakeCookedItem));
     }
 
     @AfterEach void tearDown() {
@@ -111,20 +122,20 @@ class DiningRoomTest {
         diningRoom.addNewItemOnTableOrder(order1,pizza,2);
         diningRoom.addNewItemOnTableOrder(order1,coke,2);
         TableOrder foundOrder = diningRoom.currentTableOrderOnTable(table1);
-        int sentCount = diningRoom.sendItemsForPreparation(foundOrder);
+        int sentCount = diningRoom.sendItemsForPreparation(foundOrder).size();
         assertThat(sentCount,equalTo(4));
         foundOrder = diningRoom.currentTableOrderOnTable(table1);
         List<OrderingLine> sentLines = foundOrder.getLines();
         for (OrderingLine line : sentLines) {
             assertThat(line.isSentForPreparation(),equalTo(true));
         }
-        TableOrder returnedOrder = diningRoom.addNewItemOnTableOrder(foundOrder,lasagna,1);
-        assertThat(diningRoom.sendItemsForPreparation(returnedOrder),equalTo(1));
+        TableOrder returnedOrder = diningRoom.addNewItemOnTableOrder(foundOrder,lasagna,2);
+        assertThat(diningRoom.sendItemsForPreparation(returnedOrder).size(),equalTo(2));
     }
 
     @Test
     void billOrderOnTableOrder() throws Exception {
-        TableOrder returnedOrder = diningRoom.addNewItemOnTableOrder(order1,pizza,2);
+        TableOrder returnedOrder = diningRoom.addNewItemOnTableOrder(order1,pizza,4);
         diningRoom.sendItemsForPreparation(returnedOrder);
         returnedOrder = diningRoom.billOrderOnTable(returnedOrder);
         assertNotNull(returnedOrder.getBilled());

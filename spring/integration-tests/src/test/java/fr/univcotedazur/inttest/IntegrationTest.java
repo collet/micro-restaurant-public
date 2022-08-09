@@ -1,5 +1,6 @@
 package fr.univcotedazur.inttest;
 
+import fr.univcotedazur.inttest.dto.CookedItemDTO;
 import fr.univcotedazur.inttest.dto.MenuItemDTO;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
@@ -17,14 +18,17 @@ import java.util.UUID;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
+import static org.hamcrest.MatcherAssert.*;
 
 @SpringBootTest
 class IntegrationTest {
 
     RequestSpecification menusSpec;
     RequestSpecification diningSpec;
+    RequestSpecification kitchenSpec;
     final static String TABLES = "/tables";
     final static String ORDERS = "/tableOrders";
+    final static String KITCHEN = "/kitchen";
     Map<String,UUID> menuItemDTOMap;
 
     @BeforeEach
@@ -35,6 +39,9 @@ class IntegrationTest {
         diningSpec = new RequestSpecBuilder().
                 setAccept(ContentType.JSON).setContentType(ContentType.JSON).
                 setBaseUri("http://localhost:3001").build();
+        kitchenSpec = new RequestSpecBuilder().
+                setAccept(ContentType.JSON).setContentType(ContentType.JSON).
+                setBaseUri("http://localhost:3002").build();
         List<MenuItemDTO> menuItemDTOList =
                 given()
                         .spec(menusSpec).
@@ -115,13 +122,51 @@ class IntegrationTest {
                 .post(ORDERS + "/" + orderId).
                 then()
                 .statusCode(HttpStatus.SC_CREATED);
-        given()
+        List<CookedItemDTO> cookedItemDTOs =
+                given()
                 .spec(diningSpec).
                 when()
                 .post(ORDERS + "/" + orderId + "/prepare").
                 then()
+                .statusCode(HttpStatus.SC_CREATED)
+                .extract().jsonPath().getList("",CookedItemDTO.class);
+        assertThat(cookedItemDTOs.size(),equalTo(5));
+        List<CookedItemDTO> underPreparationCookedItemDTOs =
+        given()
+                .spec(kitchenSpec).
+                when()
+                .get(KITCHEN + "?state=preparationStarted").
+                then()
                 .statusCode(HttpStatus.SC_OK)
-                .body("howManyItemsSentForPreparation",is(5));
+                .extract().jsonPath().getList("",CookedItemDTO.class);
+        assertThat(underPreparationCookedItemDTOs.size(),equalTo(5));
+        List<CookedItemDTO> readyCookedItemDTOs =
+        given()
+                .spec(kitchenSpec).
+                when()
+                .get(KITCHEN + "?state=readyToBeServed").
+                then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract().jsonPath().getList("",CookedItemDTO.class);
+        assertThat(readyCookedItemDTOs.size(),equalTo(0));
+        Thread.sleep(2000);
+        List<CookedItemDTO> servingCookedItemDTOs =
+                given()
+                        .spec(kitchenSpec).
+                        when()
+                        .get(KITCHEN + "?state=readyToBeServed").
+                        then()
+                        .statusCode(HttpStatus.SC_OK)
+                        .extract().jsonPath().getList("",CookedItemDTO.class);
+        assertThat(servingCookedItemDTOs.size(),equalTo(5));
+        for (CookedItemDTO cookedItemDTO : servingCookedItemDTOs) {
+            given()
+                    .spec(kitchenSpec).
+                    when()
+                    .post(KITCHEN + "/" + cookedItemDTO.getId() + "/takenToTable" ).
+                    then()
+                    .statusCode(HttpStatus.SC_OK);
+        }
         given()
                 .spec(diningSpec).
                 when()

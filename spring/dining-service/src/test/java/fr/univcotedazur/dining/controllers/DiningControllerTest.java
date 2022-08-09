@@ -1,9 +1,12 @@
 package fr.univcotedazur.dining.controllers;
 
+import fr.univcotedazur.dining.components.KitchenProxy;
 import fr.univcotedazur.dining.components.MenuProxy;
+import fr.univcotedazur.dining.components.dto.ItemsToBeCookedInKitchen;
 import fr.univcotedazur.dining.controllers.dto.ItemDTO;
 import fr.univcotedazur.dining.controllers.dto.StartOrderingDTO;
 import fr.univcotedazur.dining.controllers.dto.TableCreationDTO;
+import fr.univcotedazur.dining.models.CookedItem;
 import fr.univcotedazur.dining.models.OrderingItem;
 import fr.univcotedazur.dining.models.OrderingLine;
 import fr.univcotedazur.dining.repositories.TableOrderRepository;
@@ -15,6 +18,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,6 +31,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -36,6 +41,7 @@ import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.when;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.any;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -67,6 +73,9 @@ public class DiningControllerTest {
 
     @MockBean
     private MenuProxy mockedMenuProxy;
+
+    @MockBean
+    KitchenProxy mockedKitchenProxy;
 
     TableCreationDTO table1;
     Long table1Id = 124L;
@@ -114,6 +123,14 @@ public class DiningControllerTest {
                 thenReturn(Optional.of(mockPizza)).
                 thenReturn(Optional.of(mockCoke)).
                 thenReturn(Optional.of(mockLasagna));
+        CookedItem fakeCookedItem = new CookedItem();
+        fakeCookedItem.setId(UUID.randomUUID());
+        fakeCookedItem.setReadyToServe(LocalDateTime.now());
+        org.mockito.Mockito.when(mockedKitchenProxy.sendCookingOrderToKitchen(
+                org.mockito.Mockito.any(ItemsToBeCookedInKitchen.class))).
+                thenReturn(List.of(fakeCookedItem,fakeCookedItem)).
+                thenReturn(List.of(fakeCookedItem,fakeCookedItem,fakeCookedItem)).
+                thenReturn(List.of(fakeCookedItem));
     }
 
 
@@ -197,11 +214,13 @@ public class DiningControllerTest {
         for (OrderingLine line : lines) {
             assertThat(line.isSentForPreparation(),is(false));
         }
+        List<CookedItem> cookedItems =
         when()
                 .post(BASE_URI + "/" + orderId + "/prepare").
                 then()
-                .statusCode(HttpStatus.SC_OK)
-                .body("howManyItemsSentForPreparation",is(5));
+                .statusCode(HttpStatus.SC_CREATED)
+                .extract().response().jsonPath().getList("",CookedItem.class);
+        assertThat(cookedItems.size(),equalTo(5));
         lines =
                 when()
                         .get(BASE_URI + "/" + orderId).
@@ -217,11 +236,13 @@ public class DiningControllerTest {
                 .post(BASE_URI + "/" + orderId).
                 then()
                 .statusCode(HttpStatus.SC_CREATED);
-        when()
-                .post(BASE_URI + "/" + orderId + "/prepare").
-                then()
-                .statusCode(HttpStatus.SC_OK)
-                .body("howManyItemsSentForPreparation",is(1));
+        cookedItems =
+                when()
+                        .post(BASE_URI + "/" + orderId + "/prepare").
+                        then()
+                        .statusCode(HttpStatus.SC_CREATED)
+                        .extract().response().jsonPath().getList("",CookedItem.class);
+        assertThat(cookedItems.size(),equalTo(1));
     }
 
     @Test
