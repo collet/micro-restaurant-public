@@ -5,3 +5,6 @@ Microservice implementation of a restaurant management system
 
 in the `spring` directory.
 
+## NestJS implementation
+
+in the `nestjs` directory.
