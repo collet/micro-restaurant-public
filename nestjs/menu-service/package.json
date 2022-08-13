@@ -69,7 +69,14 @@
       "^.+\\.(t|j)s$": "ts-jest"
     },
     "collectCoverageFrom": [
-      "**/*.(t|j)s"
+      "**/*.(t|j)s",
+      "!**/shared/config/*.config.(t|j)s"
+    ],
+    "coveragePathIgnorePatterns": [
+      ".module.(t|j)s",
+      ".exception.(t|j)s",
+      "/src/main.ts",
+      "/src/shared/services/mongoose-config.service.ts"
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"

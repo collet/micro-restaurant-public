@@ -2,13 +2,14 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 
-import appConfig from './config/app.config';
-import mongodbConfig from './config/mongodb.config';
-import swaggeruiConfig from './config/swaggerui.config';
+import appConfig from './shared/config/app.config';
+import mongodbConfig from './shared/config/mongodb.config';
+import swaggeruiConfig from './shared/config/swaggerui.config';
 
-import { MongooseConfigService } from './mongoose-config.service';
+import { MongooseConfigService } from './shared/services/mongoose-config.service';
 
 import { MenusModule } from './menus/menus.module';
+import { StartupLogicService } from './shared/services/startup-logic.service';
 
 @Module({
   imports: [
@@ -21,5 +22,6 @@ import { MenusModule } from './menus/menus.module';
     }),
     MenusModule,
   ],
+  providers: [StartupLogicService],
 })
 export class AppModule {}

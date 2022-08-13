@@ -3,7 +3,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
-import { SwaggerUIConfig } from './config/interfaces/swaggerui-config.interface';
+import { SwaggerUIConfig } from './shared/config/interfaces/swaggerui-config.interface';
 
 import { AppModule } from './app.module';
 
