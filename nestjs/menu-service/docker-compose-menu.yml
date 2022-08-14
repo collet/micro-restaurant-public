@@ -1,0 +1,22 @@
+version: "3"
+
+services:
+  menu-service:
+    image: "nestjs-restaurant/menu-service"
+    restart: always
+    ports:
+      - 3000:3000
+    depends_on:
+      - mongo_db_menu
+    networks:
+      - nestjs-restaurant-network
+  mongo_db_menu:
+    image: "mongo:4.4.15"
+    restart: always
+    ports:
+      - 27018:27017
+    networks:
+      - nestjs-restaurant-network
+networks:
+  nestjs-restaurant-network:
+    driver: bridge
