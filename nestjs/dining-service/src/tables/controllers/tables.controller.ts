@@ -23,24 +23,24 @@ import { TablesService } from '../services/tables.service';
 export class TablesController {
   constructor(private readonly tablesService: TablesService) {}
 
-  @Get()
   @ApiOkResponse({ type: Table, isArray: true })
+  @Get()
   async listAllTables(): Promise<Table[]> {
     return this.tablesService.findAll();
   }
 
   @ApiParam({ name: 'tableNumber' })
-  @Get(':tableNumber')
   @ApiOkResponse({ type: Table })
   @ApiNotFoundResponse({ type: TableNumberNotFoundException, description: 'Table not found' })
+  @Get(':tableNumber')
   async getTableByNumber(@Param() getTableParams: GetTableParams): Promise<Table> {
     return this.tablesService.findByNumber(getTableParams.tableNumber);
   }
 
   @ApiBody({ type: AddTableDto })
-  @Post()
-  @ApiCreatedResponse({ description: 'The table has been successfully added.', type: Table })
+  @ApiCreatedResponse({ type: Table, description: 'The table has been successfully added.' })
   @ApiConflictResponse({ type: TableAlreadyExistsException, description: 'Table already exists' })
+  @Post()
   async addTable(@Body() addTableDto: AddTableDto) {
     return await this.tablesService.create(addTableDto);
   }

@@ -45,6 +45,6 @@ export class TablesService {
 
     table.taken = true;
 
-    return this.tableModel.findByIdAndUpdate(table._id, table);
+    return this.tableModel.findByIdAndUpdate(table._id, table, { returnDocument: 'after' });
   }
 }
