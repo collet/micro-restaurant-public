@@ -8,6 +8,7 @@ import { AddTableDto } from '../dto/add-table.dto';
 
 import { TableAlreadyExistsException } from '../exceptions/table-already-exists.exception';
 import { TableNumberNotFoundException } from '../exceptions/table-number-not-found.exception';
+import { TableAlreadyTakenException } from '../exceptions/table-already-taken.exception';
 
 @Injectable()
 export class TablesService {
@@ -33,5 +34,15 @@ export class TablesService {
       throw new TableAlreadyExistsException(addTableDto.number);
     }
     return await this.tableModel.create(addTableDto);
+  }
+
+  async takeTable(tableNumber: number): Promise<Table> {
+    const table:Table = await this.findByNumber(tableNumber);
+
+    if (table.taken) {
+      throw new TableAlreadyTakenException(tableNumber);
+    }
+
+    return this.tableModel.findByIdAndUpdate(table._id, { taken: true });
   }
 }

@@ -10,5 +10,6 @@ import { TablesService } from './services/tables.service';
   imports: [MongooseModule.forFeature([{ name: Table.name, schema: TableSchema }])],
   controllers: [TablesController],
   providers: [TablesService],
+  exports: [TablesService],
 })
 export class TablesModule {}

@@ -7,9 +7,10 @@ import mongodbConfig from './shared/config/mongodb.config';
 import swaggeruiConfig from './shared/config/swaggerui.config';
 
 import { MongooseConfigService } from './shared/services/mongoose-config.service';
+import { StartupLogicService } from './shared/services/startup-logic.service';
 
 import { TablesModule } from './tables/tables.module';
-import { StartupLogicService } from './shared/services/startup-logic.service';
+import { TableOrdersModule } from './table-orders/table-orders.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { StartupLogicService } from './shared/services/startup-logic.service';
       useClass: MongooseConfigService,
     }),
     TablesModule,
+    TableOrdersModule,
   ],
   providers: [StartupLogicService],
 })
