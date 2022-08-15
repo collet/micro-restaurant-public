@@ -8,7 +8,7 @@ import swaggeruiConfig from './shared/config/swaggerui.config';
 
 import { MongooseConfigService } from './shared/services/mongoose-config.service';
 
-import { MenusModule } from './menus/menus.module';
+import { TablesModule } from './tables/tables.module';
 import { StartupLogicService } from './shared/services/startup-logic.service';
 
 @Module({
@@ -20,7 +20,7 @@ import { StartupLogicService } from './shared/services/startup-logic.service';
     MongooseModule.forRootAsync({
       useClass: MongooseConfigService,
     }),
-    MenusModule,
+    TablesModule,
   ],
   providers: [StartupLogicService],
 })

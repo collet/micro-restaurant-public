@@ -4,7 +4,7 @@ import { Connection } from 'mongoose';
 
 import { StartupLogicService } from './startup-logic.service';
 
-import { AddMenuItemDto } from '../../menus/dto/add-menu-item.dto';
+import { AddTableDto } from '../../tables/dto/add-table.dto';
 
 describe('StartupLogicService', () => {
   let service: StartupLogicService;
@@ -18,7 +18,7 @@ describe('StartupLogicService', () => {
           provide: getConnectionToken(),
           useValue: {
             models: {
-              MenuItem: {
+              Table: {
                 find: jest.fn(),
                 create: jest.fn(),
               },
@@ -36,62 +36,50 @@ describe('StartupLogicService', () => {
     expect(service).toBeDefined();
   });
 
-  it('should return a AddMenuItemDto instance', () => {
-    const mockFullName = 'my fullname';
-    const mockShortName = 'my shortName';
-    const mockPrice = 8;
+  it('should return a AddTableDto instance', () => {
+    const mockNumber = 8;
 
-    const menuItem: AddMenuItemDto = new AddMenuItemDto();
-    menuItem.fullName = mockFullName;
-    menuItem.shortName = mockShortName;
-    menuItem.price = mockPrice;
+    const table: AddTableDto = new AddTableDto();
+    table.number = mockNumber;
 
-    const addMenuItem = service.createMenuItem(mockFullName, mockShortName, mockPrice);
-    expect(addMenuItem).toEqual(menuItem);
+    const addTable = service.createTable(mockNumber);
+    expect(addTable).toEqual(table);
   });
 
-  it('should add a new menu item', async () => {
-    const mockFullName = 'my fullname';
-    const mockShortName = 'my shortName';
-    const mockPrice = 8;
+  it('should add a new table', async () => {
+    const mockNumber = 8;
 
-    const mockMenuItem = {
-      fullName: mockFullName,
-      shortName: mockShortName,
-      price: mockPrice,
+    const mockTable = {
+      number: mockNumber,
     };
 
-    jest.spyOn(connection.models.MenuItem, 'find').mockResolvedValueOnce([]);
-    jest.spyOn(connection.models.MenuItem, 'create').mockImplementationOnce(() =>
-      Promise.resolve(mockMenuItem),
+    jest.spyOn(connection.models.Table, 'find').mockResolvedValueOnce([]);
+    jest.spyOn(connection.models.Table, 'create').mockImplementationOnce(() =>
+      Promise.resolve(mockTable),
     );
-    const newMenuItem = await service.addMenuItem(mockFullName, mockShortName, mockPrice);
-    expect(newMenuItem).toEqual(mockMenuItem);
+    const newTable = await service.addTable(mockNumber);
+    expect(newTable).toEqual(mockTable);
   });
 
-  it('should throw an error if menu item already exists', async () => {
-    const mockFullName = 'my fullname';
-    const mockShortName = 'my shortName';
-    const mockPrice = 8;
+  it('should throw an error if table item already exists', async () => {
+    const mockNumber = 8;
 
-    const mockMenuItem = {
-      fullName: mockFullName,
-      shortName: mockShortName,
-      price: mockPrice,
+    const mockTable = {
+      number: mockNumber,
     };
 
-    jest.spyOn(connection.models.MenuItem, 'find').mockResolvedValueOnce([mockMenuItem]);
+    jest.spyOn(connection.models.Table, 'find').mockResolvedValueOnce([mockTable]);
 
-    const testAddMenuItem = async () => {
-      await service.addMenuItem(mockFullName, mockShortName, mockPrice);
+    const testAddTable = async () => {
+      await service.addTable(mockNumber);
     };
-    await expect(testAddMenuItem).rejects.toThrow();
+    await expect(testAddTable).rejects.toThrow();
   });
 
-  it ('should seed the db with some menu items', async () => {
-    service.addMenuItem = jest.fn();
+  it ('should seed the db with some tables', async () => {
+    service.addTable = jest.fn();
     await service.onApplicationBootstrap();
 
-    expect(service.addMenuItem).toHaveBeenCalledTimes(3);
+    expect(service.addTable).toHaveBeenCalledTimes(3);
   });
 });

@@ -2,35 +2,33 @@ import { OnApplicationBootstrap } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/mongoose';
 import { Connection } from 'mongoose';
 
-import { AddMenuItemDto } from '../../menus/dto/add-menu-item.dto';
+import { AddTableDto } from '../../tables/dto/add-table.dto';
 
 export class StartupLogicService implements OnApplicationBootstrap {
   constructor(@InjectConnection() private connection: Connection) {}
 
-  createMenuItem(fullName: string, shortName: string, price: number): AddMenuItemDto {
-    const menuItem: AddMenuItemDto = new AddMenuItemDto();
-    menuItem.fullName = fullName;
-    menuItem.shortName = shortName;
-    menuItem.price = price;
-    return menuItem;
+  createTable(number: number): AddTableDto {
+    const table: AddTableDto = new AddTableDto();
+    table.number = number;
+    return table;
   }
 
-  async addMenuItem(fullName: string, shortName: string, price: number) {
-    const menuItemModel = this.connection.models['MenuItem'];
+  async addTable(number: number) {
+    const tableModel = this.connection.models['Table'];
 
-    const alreadyExists = await menuItemModel.find({ shortName });
+    const alreadyExists = await tableModel.find({ number });
     if (alreadyExists.length > 0) {
-      throw new Error('Menu Item already exists.');
+      throw new Error('Table already exists.');
     }
 
-    return menuItemModel.create(this.createMenuItem(fullName, shortName, price));
+    return tableModel.create(this.createTable(number));
   }
 
   async onApplicationBootstrap() {
     try {
-      await this.addMenuItem('Delicious Pizza Regina','pizza',12);
-      await this.addMenuItem('Lasagna al forno','lasagna',16);
-      await this.addMenuItem('Bottled coke (33cl)','coke',3.5);
+      await this.addTable(1);
+      await this.addTable(2);
+      await this.addTable(3);
     } catch (e) {
     }
   }

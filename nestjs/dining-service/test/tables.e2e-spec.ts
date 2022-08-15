@@ -10,37 +10,29 @@ import swaggeruiConfig from '../src/shared/config/swaggerui.config';
 
 import { MongooseConfigService } from '../src/shared/services/mongoose-config.service';
 
-import { MenusModule } from '../src/menus/menus.module';
-import { MenusService } from '../src/menus/services/menus.service';
+import { TablesModule } from '../src/tables/tables.module';
+import { TablesService } from '../src/tables/services/tables.service';
 
-describe('MenusController (e2e)', () => {
+describe('TablesController (e2e)', () => {
   let app: INestApplication;
 
-  const mockMenuItemList = [
+  const mockTableList = [
     {
-      fullName: 'MenuItem #1',
-      shortName: 'MI1',
-      price: 1,
+      number: 1,
     },
     {
-      fullName: 'MenuItem #2',
-      shortName: 'MI2',
-      price: 2,
+      number: 2,
     },
     {
-      fullName: 'MenuItem #3',
-      shortName: 'MI3',
-      price: 3,
+      number: 3,
     },
   ];
 
-  const menusService = {
-    findAll: () => mockMenuItemList,
-    findOne: () => mockMenuItemList[0],
+  const tablesService = {
+    findAll: () => mockTableList,
+    findByNumber: () => mockTableList[0],
     create: () => ({
-      fullName: 'MenuItem #4',
-      shortName: 'MI4',
-      price: 4,
+      number: 4,
     }),
   };
 
@@ -54,42 +46,40 @@ describe('MenusController (e2e)', () => {
         MongooseModule.forRootAsync({
           useClass: MongooseConfigService,
         }),
-        MenusModule
+        TablesModule
       ],
     })
-      .overrideProvider(MenusService)
-      .useValue(menusService)
+      .overrideProvider(TablesService)
+      .useValue(tablesService)
       .compile();
 
     app = moduleFixture.createNestApplication();
     await app.init();
   });
 
-  it('/menus (GET)', () => {
+  it('/tables (GET)', () => {
     return request(app.getHttpServer())
-      .get('/menus')
+      .get('/tables')
       .expect(200)
-      .expect(menusService.findAll());
+      .expect(tablesService.findAll());
   });
 
-  it('/menus/itemId1 (GET)', () => {
+  it('/tables/1 (GET)', () => {
     return request(app.getHttpServer())
-      .get('/menus/itemId1')
+      .get('/tables/1')
       .expect(200)
-      .expect(menusService.findOne());
+      .expect(tablesService.findByNumber());
   });
 
-  it('/menus (POST)', () => {
+  it('/tables (POST)', () => {
     return request(app.getHttpServer())
-      .post('/menus')
+      .post('/tables')
       .send({
-        fullName: 'MenuItem #4',
-        shortName: 'MI4',
-        price: 4,
+        number: 4,
       })
       .set('Accept', 'application/json')
       .expect(201)
-      .expect(menusService.create());
+      .expect(tablesService.create());
   });
 
   afterAll(async () => {
