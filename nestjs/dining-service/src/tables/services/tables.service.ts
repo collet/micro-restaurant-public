@@ -43,6 +43,8 @@ export class TablesService {
       throw new TableAlreadyTakenException(tableNumber);
     }
 
-    return this.tableModel.findByIdAndUpdate(table._id, { taken: true });
+    table.taken = true;
+
+    return this.tableModel.findByIdAndUpdate(table._id, table);
   }
 }

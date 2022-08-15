@@ -1,18 +1,9 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Prop } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 
 import { OrderingItem } from './ordering-item.schema';
 
-export type OrderingLineDocument = OrderingLine & Document;
-
-@Schema({
-  versionKey: false,
-})
 export class OrderingLine {
-  @ApiProperty()
-  _id: string;
-
   @ApiProperty()
   @Prop({ required: true })
   item: OrderingItem;
@@ -25,5 +16,3 @@ export class OrderingLine {
   @Prop({ default: false })
   sentForPreparation: boolean;
 }
-
-export const OrderingLineSchema = SchemaFactory.createForClass(OrderingLine);
