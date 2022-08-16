@@ -48,6 +48,11 @@ export class TableOrdersService {
 
   async addOrderingLineToTableOrder(tableOrderId: string, addMenuItemDto: AddMenuItemDto): Promise<TableOrder> {
     const tableOrder: TableOrder = await this.findOne(tableOrderId);
+
+    if (tableOrder.billed !== null) {
+      throw new TableOrderAlreadyBilledException(tableOrder);
+    }
+
     const orderingItem: OrderingItem = await this.menuProxyService.findByShortName(addMenuItemDto.menuItemShortName);
 
     if (orderingItem === null) {
@@ -58,15 +63,46 @@ export class TableOrdersService {
       throw new AddMenuItemDtoNotFoundException(addMenuItemDto);
     }
 
-    if (tableOrder.billed !== null) {
-      throw new TableOrderAlreadyBilledException(tableOrder);
-    }
-
     const orderingLine: OrderingLine = new OrderingLine();
     orderingLine.item = orderingItem;
     orderingLine.howMany = addMenuItemDto.howMany;
 
     tableOrder.lines.push(orderingLine);
+
+    return this.tableOrderModel.findByIdAndUpdate(tableOrder._id, tableOrder, { returnDocument: 'after' });
+  }
+
+  async sendItemsForPreparation(tableOrderId: string): Promise<TableOrder> {
+    const tableOrder: TableOrder = await this.findOne(tableOrderId);
+
+    if (tableOrder.billed !== null) {
+      throw new TableOrderAlreadyBilledException(tableOrder);
+    }
+
+    tableOrder.lines = tableOrder.lines.map((orderingLine) => {
+      if (!orderingLine.sentForPreparation) {
+        // TODO: send item to kitchen using kitchen-service
+        orderingLine.sentForPreparation = true;
+      }
+      return orderingLine;
+    });
+
+    return this.tableOrderModel.findByIdAndUpdate(tableOrder._id, tableOrder, { returnDocument: 'after' });
+  }
+
+  async billOrder(tableOrderId: string): Promise<TableOrder> {
+    const tableOrder: TableOrder = await this.findOne(tableOrderId);
+
+    if (tableOrder.billed !== null) {
+      throw new TableOrderAlreadyBilledException(tableOrder);
+    }
+
+    tableOrder.billed = new Date();
+
+    // TODO: Send payment for the table order
+
+    // TODO: Move next line when billing is managed
+    await this.tablesService.releaseTable(tableOrder.tableNumber);
 
     return this.tableOrderModel.findByIdAndUpdate(tableOrder._id, tableOrder, { returnDocument: 'after' });
   }

@@ -9,6 +9,7 @@ import { AddTableDto } from '../dto/add-table.dto';
 import { TableAlreadyExistsException } from '../exceptions/table-already-exists.exception';
 import { TableNumberNotFoundException } from '../exceptions/table-number-not-found.exception';
 import { TableAlreadyTakenException } from '../exceptions/table-already-taken.exception';
+import { TableAlreadyFreeException } from '../exceptions/table-already-free.exception';
 
 @Injectable()
 export class TablesService {
@@ -44,6 +45,18 @@ export class TablesService {
     }
 
     table.taken = true;
+
+    return this.tableModel.findByIdAndUpdate(table._id, table, { returnDocument: 'after' });
+  }
+
+  async releaseTable(tableNumber: number): Promise<Table> {
+    const table:Table = await this.findByNumber(tableNumber);
+
+    if (!table.taken) {
+      throw new TableAlreadyFreeException(tableNumber);
+    }
+
+    table.taken = false;
 
     return this.tableModel.findByIdAndUpdate(table._id, table, { returnDocument: 'after' });
   }

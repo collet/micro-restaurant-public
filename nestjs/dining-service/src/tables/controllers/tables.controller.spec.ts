@@ -10,36 +10,41 @@ describe('TablesController', () => {
   let controller: TablesController;
   let service: TablesService;
 
-  const addTableDto: AddTableDto = {
-    number: 12,
-  };
-
-  const mockTableList = [
-    {
-      number: 1,
-      taken: false,
-    },
-    {
-      number: 2,
-      taken: false,
-    },
-    {
-      number: 3,
-      taken: false,
-    },
-  ];
-
-  const mockTable = {
-    _id: 'table id',
-    number: 12,
-    taken: false,
-  };
-
-  const mockGetTableParams: GetTableParams = {
-    tableNumber: mockTable.number,
-  };
+  let addTableDto: AddTableDto;
+  let mockTableList;
+  let mockTable;
+  let mockGetTableParams: GetTableParams;
 
   beforeEach(async () => {
+    addTableDto = {
+      number: 12,
+    };
+
+    mockTableList = [
+      {
+        number: 1,
+        taken: false,
+      },
+      {
+        number: 2,
+        taken: false,
+      },
+      {
+        number: 3,
+        taken: false,
+      },
+    ];
+
+    mockTable = {
+      _id: 'table id',
+      number: 12,
+      taken: false,
+    };
+
+    mockGetTableParams = {
+      tableNumber: mockTable.number,
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       controllers: [TablesController],
       providers: [
@@ -48,7 +53,7 @@ describe('TablesController', () => {
           useValue: {
             findAll: jest.fn().mockResolvedValue(mockTableList),
             findByNumber: jest.fn().mockResolvedValue(mockTable),
-            create: jest.fn().mockResolvedValue(addTableDto),
+            create: jest.fn(),
           },
         },
       ],

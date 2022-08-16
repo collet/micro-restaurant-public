@@ -15,4 +15,10 @@ export class OrderingLine {
   @ApiProperty()
   @Prop({ default: false })
   sentForPreparation: boolean;
+
+  constructor() {
+    this.item = null;
+    this.howMany = 0;
+    this.sentForPreparation = false;
+  }
 }

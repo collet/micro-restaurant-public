@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Param, Post } from '@nestjs/common';
 import {
   ApiBody,
   ApiUnprocessableEntityResponse,
@@ -59,5 +59,24 @@ export class TableOrdersController {
   @Post(':tableOrderId')
   async addMenuItemToTableOrder(@Param() getTableOrderParams: GetTableOrderParams, @Body() addMenuItemDto: AddMenuItemDto): Promise<TableOrder> {
     return this.tableOrdersService.addOrderingLineToTableOrder(getTableOrderParams.tableOrderId, addMenuItemDto);
+  }
+
+  @ApiParam({ name: 'tableOrderId' })
+  @ApiCreatedResponse({ type: TableOrder, description: 'The menu items have been successfully sent for preparation.' })
+  @ApiNotFoundResponse({ type: TableOrderIdNotFoundException, description: 'Table order not found' })
+  @ApiUnprocessableEntityResponse({ type: TableOrderAlreadyBilledException, description: 'TableOrder is already billed' })
+  @Post(':tableOrderId/prepare')
+  async prepareTableOrder(@Param() getTableOrderParams: GetTableOrderParams): Promise<TableOrder> {
+    return this.tableOrdersService.sendItemsForPreparation(getTableOrderParams.tableOrderId);
+  }
+
+  @ApiParam({ name: 'tableOrderId' })
+  @ApiOkResponse({ type: TableOrder, description: 'The table has been successfully billed.' })
+  @ApiNotFoundResponse({ type: TableOrderIdNotFoundException, description: 'Table order not found' })
+  @ApiUnprocessableEntityResponse({ type: TableOrderAlreadyBilledException, description: 'TableOrder is already billed' })
+  @HttpCode(200)
+  @Post(':tableOrderId/bill')
+  async billTableOrder(@Param() getTableOrderParams: GetTableOrderParams): Promise<TableOrder> {
+    return this.tableOrdersService.billOrder(getTableOrderParams.tableOrderId);
   }
 }
