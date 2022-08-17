@@ -8,7 +8,7 @@ export class OrderingItem {
   shortName: string;
 
   constructor(anyObject: any = {}) {
-    this._id = anyObject?._id || null;
-    this.shortName = anyObject?.shortName || null;
+    this._id = anyObject._id || null;
+    this.shortName = anyObject.shortName || null;
   }
 }

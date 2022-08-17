@@ -22,7 +22,7 @@ export class MenuProxyService {
 
   private async retrieveFullMenu() {
     if (this._menuItemsByShortName === null) {
-      const retrieveFullMenuCallResponse: AxiosResponse<MenuItem> = await firstValueFrom(this.httpService.get(this._baseUrl));
+      const retrieveFullMenuCallResponse: AxiosResponse<MenuItem[]> = await firstValueFrom(this.httpService.get(this._baseUrl));
       this._menuItemsByShortName = _keyBy(retrieveFullMenuCallResponse.data, 'shortName');
     }
   }

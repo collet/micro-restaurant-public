@@ -12,6 +12,7 @@ import { MongooseConfigService } from '../src/shared/services/mongoose-config.se
 
 import { TablesModule } from '../src/tables/tables.module';
 import { TablesService } from '../src/tables/services/tables.service';
+import dependenciesConfig from '../src/shared/config/dependencies.config';
 
 describe('TablesController (e2e)', () => {
   let app: INestApplication;
@@ -41,7 +42,7 @@ describe('TablesController (e2e)', () => {
       imports: [
         ConfigModule.forRoot({
           isGlobal: true,
-          load: [appConfig, mongodbConfig, swaggeruiConfig],
+          load: [appConfig, mongodbConfig, swaggeruiConfig, dependenciesConfig],
         }),
         MongooseModule.forRootAsync({
           useClass: MongooseConfigService,

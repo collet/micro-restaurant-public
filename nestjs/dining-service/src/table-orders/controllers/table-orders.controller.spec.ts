@@ -89,7 +89,7 @@ describe('TableOrdersController', () => {
       },
     ];
 
-    buildMockTableOrder = (opened: null, lines = [], billed = null) => ({
+    buildMockTableOrder = (opened = null, lines = [], billed = null) => ({
       ...mockTableOrder,
       opened,
       lines,
