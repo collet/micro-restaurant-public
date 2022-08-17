@@ -2,35 +2,35 @@ import { OnApplicationBootstrap } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/mongoose';
 import { Connection } from 'mongoose';
 
-import { AddMenuItemDto } from '../../menus/dto/add-menu-item.dto';
+import { Recipe } from '../../cookedItems/schemas/recipe.schema';
 
 export class StartupLogicService implements OnApplicationBootstrap {
   constructor(@InjectConnection() private connection: Connection) {}
 
-  createMenuItem(fullName: string, shortName: string, price: number): AddMenuItemDto {
-    const menuItem: AddMenuItemDto = new AddMenuItemDto();
-    menuItem.fullName = fullName;
-    menuItem.shortName = shortName;
-    menuItem.price = price;
-    return menuItem;
+  createRecipe(shortName: string, cookingSteps: string[], meanCookingTimeInSec: number): Recipe {
+    const recipe: Recipe = new Recipe();
+    recipe.shortName = shortName;
+    recipe.cookingSteps = cookingSteps;
+    recipe.meanCookingTimeInSec = meanCookingTimeInSec;
+    return recipe;
   }
 
-  async addMenuItem(fullName: string, shortName: string, price: number) {
-    const menuItemModel = this.connection.models['MenuItem'];
+  async addRecipe(shortName: string, cookingSteps: string[], meanCookingTimeInSec: number) {
+    const recipeModel = this.connection.models['Recipe'];
 
-    const alreadyExists = await menuItemModel.find({ shortName });
+    const alreadyExists = await recipeModel.find({ shortName });
     if (alreadyExists.length > 0) {
-      throw new Error('Menu Item already exists.');
+      throw new Error('Recipe already exists.');
     }
 
-    return menuItemModel.create(this.createMenuItem(fullName, shortName, price));
+    return recipeModel.create(this.createRecipe(shortName, cookingSteps, meanCookingTimeInSec));
   }
 
   async onApplicationBootstrap() {
     try {
-      await this.addMenuItem('Delicious Pizza Regina','pizza',12);
-      await this.addMenuItem('Lasagna al forno','lasagna',16);
-      await this.addMenuItem('Bottled coke (33cl)','coke',3.5);
+      await this.addRecipe('pizza', ['Stretch pizza dough', 'Put toppings on it', 'Bake at 350 Celsius degree'], 10);
+      await this.addRecipe('lasagna', ['Get the frozen dish', 'Oven it at 220 Celsius degree'], 8);
+      await this.addRecipe('coke', ['Serve it!'], 2);
     } catch (e) {
     }
   }

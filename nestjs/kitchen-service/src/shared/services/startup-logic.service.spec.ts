@@ -4,7 +4,7 @@ import { Connection } from 'mongoose';
 
 import { StartupLogicService } from './startup-logic.service';
 
-import { AddMenuItemDto } from '../../menus/dto/add-menu-item.dto';
+import { Recipe } from '../../cookedItems/schemas/recipe.schema';
 
 describe('StartupLogicService', () => {
   let service: StartupLogicService;
@@ -18,7 +18,7 @@ describe('StartupLogicService', () => {
           provide: getConnectionToken(),
           useValue: {
             models: {
-              MenuItem: {
+              Recipe: {
                 find: jest.fn(),
                 create: jest.fn(),
               },
@@ -36,62 +36,62 @@ describe('StartupLogicService', () => {
     expect(service).toBeDefined();
   });
 
-  it('should return a AddMenuItemDto instance', () => {
-    const mockFullName = 'my fullname';
+  it('should return a Recipe instance', () => {
     const mockShortName = 'my shortName';
-    const mockPrice = 8;
+    const mockCookingSteps = ['step 1', 'step 2'];
+    const mockMeanCookingTimeInSec = 8;
 
-    const menuItem: AddMenuItemDto = new AddMenuItemDto();
-    menuItem.fullName = mockFullName;
-    menuItem.shortName = mockShortName;
-    menuItem.price = mockPrice;
+    const recipe: Recipe = new Recipe();
+    recipe.shortName = mockShortName;
+    recipe.cookingSteps = mockCookingSteps;
+    recipe.meanCookingTimeInSec = mockMeanCookingTimeInSec;
 
-    const addMenuItem = service.createMenuItem(mockFullName, mockShortName, mockPrice);
-    expect(addMenuItem).toEqual(menuItem);
+    const createdRecipe = service.createRecipe(mockShortName, mockCookingSteps, mockMeanCookingTimeInSec);
+    expect(createdRecipe).toEqual(recipe);
   });
 
-  it('should add a new menu item', async () => {
-    const mockFullName = 'my fullname';
+  it('should add a new recipe', async () => {
     const mockShortName = 'my shortName';
-    const mockPrice = 8;
+    const mockCookingSteps = ['step 1', 'step 2'];
+    const mockMeanCookingTimeInSec = 8;
 
-    const mockMenuItem = {
-      fullName: mockFullName,
+    const mockRecipe = {
       shortName: mockShortName,
-      price: mockPrice,
+      cookingSteps: mockCookingSteps,
+      meanCookingTimeInSec: mockMeanCookingTimeInSec,
     };
 
-    jest.spyOn(connection.models.MenuItem, 'find').mockResolvedValueOnce([]);
-    jest.spyOn(connection.models.MenuItem, 'create').mockImplementationOnce(() =>
-      Promise.resolve(mockMenuItem),
+    jest.spyOn(connection.models.Recipe, 'find').mockResolvedValueOnce([]);
+    jest.spyOn(connection.models.Recipe, 'create').mockImplementationOnce(() =>
+      Promise.resolve(mockRecipe),
     );
-    const newMenuItem = await service.addMenuItem(mockFullName, mockShortName, mockPrice);
-    expect(newMenuItem).toEqual(mockMenuItem);
+    const newRecipe = await service.addRecipe(mockShortName, mockCookingSteps, mockMeanCookingTimeInSec);
+    expect(newRecipe).toEqual(mockRecipe);
   });
 
-  it('should throw an error if menu item already exists', async () => {
-    const mockFullName = 'my fullname';
+  it('should throw an error if recipe already exists', async () => {
     const mockShortName = 'my shortName';
-    const mockPrice = 8;
+    const mockCookingSteps = ['step 1', 'step 2'];
+    const mockMeanCookingTimeInSec = 8;
 
-    const mockMenuItem = {
-      fullName: mockFullName,
+    const mockRecipe = {
       shortName: mockShortName,
-      price: mockPrice,
+      cookingSteps: mockCookingSteps,
+      meanCookingTimeInSec: mockMeanCookingTimeInSec,
     };
 
-    jest.spyOn(connection.models.MenuItem, 'find').mockResolvedValueOnce([mockMenuItem]);
+    jest.spyOn(connection.models.Recipe, 'find').mockResolvedValueOnce([mockRecipe]);
 
-    const testAddMenuItem = async () => {
-      await service.addMenuItem(mockFullName, mockShortName, mockPrice);
+    const testAddRecipe = async () => {
+      await service.addRecipe(mockShortName, mockCookingSteps, mockMeanCookingTimeInSec);
     };
-    await expect(testAddMenuItem).rejects.toThrow();
+    await expect(testAddRecipe).rejects.toThrow();
   });
 
-  it ('should seed the db with some menu items', async () => {
-    service.addMenuItem = jest.fn();
+  it ('should seed the db with some recipes', async () => {
+    service.addRecipe = jest.fn();
     await service.onApplicationBootstrap();
 
-    expect(service.addMenuItem).toHaveBeenCalledTimes(3);
+    expect(service.addRecipe).toHaveBeenCalledTimes(3);
   });
 });
