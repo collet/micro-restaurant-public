@@ -1,7 +1,7 @@
 version: "3"
 
 services:
-  menu-service:
+  dining-service:
     image: "nestjs-restaurant/dining-service"
     restart: always
     ports:
