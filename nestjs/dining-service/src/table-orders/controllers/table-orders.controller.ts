@@ -21,6 +21,7 @@ import { TableNumberNotFoundException } from '../../tables/exceptions/table-numb
 import { TableOrdersService } from '../services/table-orders.service';
 import { AddMenuItemDtoNotFoundException } from '../exceptions/add-menu-item-dto-not-found.exception';
 import { TableOrderAlreadyBilledException } from '../exceptions/table-order-already-billed.exception';
+import { CookedItemDto } from '../dto/cooked-item.dto';
 
 @ApiTags('tableOrders')
 @Controller('/tableOrders')
@@ -62,11 +63,11 @@ export class TableOrdersController {
   }
 
   @ApiParam({ name: 'tableOrderId' })
-  @ApiCreatedResponse({ type: TableOrder, description: 'The menu items have been successfully sent for preparation.' })
+  @ApiCreatedResponse({ type: CookedItemDto, isArray: true, description: 'The menu items have been successfully sent for preparation.' })
   @ApiNotFoundResponse({ type: TableOrderIdNotFoundException, description: 'Table order not found' })
   @ApiUnprocessableEntityResponse({ type: TableOrderAlreadyBilledException, description: 'TableOrder is already billed' })
   @Post(':tableOrderId/prepare')
-  async prepareTableOrder(@Param() getTableOrderParams: GetTableOrderParams): Promise<TableOrder> {
+  async prepareTableOrder(@Param() getTableOrderParams: GetTableOrderParams): Promise<CookedItemDto[]> {
     return this.tableOrdersService.sendItemsForPreparation(getTableOrderParams.tableOrderId);
   }
 

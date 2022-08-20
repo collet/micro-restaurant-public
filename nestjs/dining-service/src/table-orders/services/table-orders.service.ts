@@ -10,16 +10,24 @@ import { OrderingLine } from '../schemas/ordering-line.schema';
 import { StartOrderingDto } from '../dto/start-ordering.dto';
 import { AddMenuItemDto } from '../dto/add-menu-item.dto';
 
-import { MenuProxyService } from './menu-proxy.service';
 import { TablesService } from '../../tables/services/tables.service';
+import { MenuProxyService } from './menu-proxy.service';
+import { KitchenProxyService } from './kitchen-proxy.service';
 
 import { TableOrderIdNotFoundException } from '../exceptions/table-order-id-not-found.exception';
 import { AddMenuItemDtoNotFoundException } from '../exceptions/add-menu-item-dto-not-found.exception';
 import { TableOrderAlreadyBilledException } from '../exceptions/table-order-already-billed.exception';
+import { CookedItemDto } from '../dto/cooked-item.dto';
+import { OrderingLineWithCookedItems } from '../interfaces/ordering-line-with-cooked-items.interface';
 
 @Injectable()
 export class TableOrdersService {
-  constructor(@InjectModel(TableOrder.name) private tableOrderModel: Model<TableOrderDocument>, private readonly tablesService: TablesService, private readonly menuProxyService: MenuProxyService) {}
+  constructor(
+    @InjectModel(TableOrder.name) private tableOrderModel: Model<TableOrderDocument>,
+    private readonly tablesService: TablesService,
+    private readonly menuProxyService: MenuProxyService,
+    private readonly kitchenProxyService: KitchenProxyService,
+  ) {}
 
   async findAll(): Promise<TableOrder[]> {
     return this.tableOrderModel.find().lean();
@@ -72,22 +80,41 @@ export class TableOrdersService {
     return this.tableOrderModel.findByIdAndUpdate(tableOrder._id, tableOrder, { returnDocument: 'after' });
   }
 
-  async sendItemsForPreparation(tableOrderId: string): Promise<TableOrder> {
+  async manageOrderingLine(orderingLine: OrderingLine): Promise<OrderingLineWithCookedItems> {
+    let cookedItems: CookedItemDto[] = [];
+
+    if (!orderingLine.sentForPreparation) {
+      cookedItems = await this.kitchenProxyService.sendItemsToCook(orderingLine);
+      orderingLine.sentForPreparation = true;
+    }
+
+    return {
+      orderingLine,
+      cookedItems,
+    };
+  };
+
+  async sendItemsForPreparation(tableOrderId: string): Promise<CookedItemDto[]> {
     const tableOrder: TableOrder = await this.findOne(tableOrderId);
 
     if (tableOrder.billed !== null) {
       throw new TableOrderAlreadyBilledException(tableOrder);
     }
 
-    tableOrder.lines = tableOrder.lines.map((orderingLine) => {
-      if (!orderingLine.sentForPreparation) {
-        // TODO: send item to kitchen using kitchen-service
-        orderingLine.sentForPreparation = true;
-      }
-      return orderingLine;
+    let newCookedItems: CookedItemDto[] = [];
+
+    const managedLinesPromesses: Promise<OrderingLineWithCookedItems>[] = tableOrder.lines.map((orderingLine) => (this.manageOrderingLine(orderingLine)));
+
+    const managedLines: OrderingLineWithCookedItems[] = await Promise.all(managedLinesPromesses);
+
+    tableOrder.lines = managedLines.map((managedLine) => {
+      newCookedItems = newCookedItems.concat(managedLine.cookedItems);
+      return managedLine.orderingLine;
     });
 
-    return this.tableOrderModel.findByIdAndUpdate(tableOrder._id, tableOrder, { returnDocument: 'after' });
+    await this.tableOrderModel.findByIdAndUpdate(tableOrder._id, tableOrder, { returnDocument: 'after' });
+
+    return newCookedItems;
   }
 
   async billOrder(tableOrderId: string): Promise<TableOrder> {

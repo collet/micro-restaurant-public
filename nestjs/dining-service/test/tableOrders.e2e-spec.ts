@@ -15,6 +15,7 @@ import { TableOrdersModule } from '../src/table-orders/table-orders.module';
 import { TablesModule } from '../src/tables/tables.module';
 
 import { TableOrdersService } from '../src/table-orders/services/table-orders.service';
+import { CookedItemDto } from '../src/table-orders/dto/cooked-item.dto';
 
 describe('TableOrdersController (e2e)', () => {
   let app: INestApplication;
@@ -103,12 +104,27 @@ describe('TableOrdersController (e2e)', () => {
     billed: billed ? billed.toDateString() : null,
   });
 
+  const mockCookedItems = [
+    {
+      _id: 'cooked item id 1',
+      readyToServe: (new Date()).toISOString(),
+    },
+    {
+      _id: 'cooked item id 2',
+      readyToServe: (new Date()).toISOString(),
+    },
+    {
+      _id: 'cooked item id 3',
+      readyToServe: (new Date()).toISOString(),
+    }
+  ];
+
   const tableOrdersService = {
     findAll: () => mockTableOrdersList,
     findOne: () => mockTableOrdersList[0],
     startOrdering: () => (buildMockTableOrder(new Date())),
     addOrderingLineToTableOrder: () => (buildMockTableOrder(new Date(), mockOrderingLineList)),
-    sendItemsForPreparation: () => (buildMockTableOrder(new Date(), mockOrderingLineSentForPrepationList)),
+    sendItemsForPreparation: () => (mockCookedItems),
     billOrder: () => (buildMockTableOrder(new Date(), mockOrderingLineList, new Date())),
   };
 

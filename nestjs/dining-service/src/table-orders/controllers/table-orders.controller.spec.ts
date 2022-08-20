@@ -5,6 +5,7 @@ import { TableOrdersService } from '../services/table-orders.service';
 
 import { StartOrderingDto } from '../dto/start-ordering.dto';
 import { AddMenuItemDto } from '../dto/add-menu-item.dto';
+import { CookedItemDto } from '../dto/cooked-item.dto';
 import { GetTableOrderParams } from '../params/get-table-order.params';
 
 import { TableOrder } from '../schemas/table-order.schema';
@@ -23,6 +24,7 @@ describe('TableOrdersController', () => {
   let mockGetTableOrderParams: GetTableOrderParams;
   let startOrderingDto: StartOrderingDto;
   let addMenuItemDto: AddMenuItemDto;
+  let mockCookedItems: CookedItemDto[];
 
   beforeEach(async () => {
     mockTableOrdersList = [
@@ -111,6 +113,21 @@ describe('TableOrdersController', () => {
       howMany: 42,
     };
 
+    mockCookedItems = [
+      {
+        _id: 'cooked item id 1',
+        readyToServe: (new Date()).toISOString(),
+      },
+      {
+        _id: 'cooked item id 2',
+        readyToServe: (new Date()).toISOString(),
+      },
+      {
+        _id: 'cooked item id 3',
+        readyToServe: (new Date()).toISOString(),
+      }
+    ];
+
     const module: TestingModule = await Test.createTestingModule({
       controllers: [TableOrdersController],
       providers: [
@@ -172,11 +189,9 @@ describe('TableOrdersController', () => {
 
   describe('prepareTableOrder()', () => {
     it('should send items for preparation from tableOrder', async () => {
-      const mockOpened = new Date();
-      const mockOrderingLines = mockOrderingLineList.map((orderingLine) => ({ ...orderingLine, sentForPreparation: true }))
       const createSpy = jest
         .spyOn(service, 'sendItemsForPreparation')
-        .mockResolvedValueOnce(buildMockTableOrder(mockOpened, mockOrderingLines));
+        .mockResolvedValueOnce(mockCookedItems);
 
       await controller.prepareTableOrder(mockGetTableOrderParams);
       expect(createSpy).toHaveBeenCalledWith(mockGetTableOrderParams.tableOrderId);

@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 
 import { TableOrdersService } from './table-orders.service';
 import { MenuProxyService } from './menu-proxy.service';
+import { KitchenProxyService } from './kitchen-proxy.service';
 import { TablesService } from '../../tables/services/tables.service';
 
 import { TableOrder } from '../schemas/table-order.schema';
@@ -13,6 +14,7 @@ import { Table } from '../../tables/schemas/table.schema';
 
 import { StartOrderingDto } from '../dto/start-ordering.dto';
 import { AddMenuItemDto } from '../dto/add-menu-item.dto';
+import { CookedItemDto } from '../dto/cooked-item.dto';
 
 import { GetTableOrderParams } from '../params/get-table-order.params';
 
@@ -25,6 +27,7 @@ describe('TableOrdersService', () => {
   let model: Model<TableOrder>;
   let tablesService: TablesService;
   let menuProxyService: MenuProxyService;
+  let kitchenProxyService: KitchenProxyService;
 
   let mockTableOrdersList: TableOrder[];
   let mockTableOrder: TableOrder;
@@ -35,6 +38,7 @@ describe('TableOrdersService', () => {
   let mockGetTableOrderParams: GetTableOrderParams;
   let startOrderingDto: StartOrderingDto;
   let addMenuItemDto: AddMenuItemDto;
+  let mockCookedItems: CookedItemDto[];
 
   let mockTableList: Table[];
   let mockTable: Table;
@@ -169,6 +173,21 @@ describe('TableOrdersService', () => {
       taken: true,
     };
 
+    mockCookedItems = [
+      {
+        _id: 'cooked item id 1',
+        readyToServe: (new Date()).toISOString(),
+      },
+      {
+        _id: 'cooked item id 2',
+        readyToServe: (new Date()).toISOString(),
+      },
+      {
+        _id: 'cooked item id 3',
+        readyToServe: (new Date()).toISOString(),
+      }
+    ];
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         TableOrdersService,
@@ -200,6 +219,12 @@ describe('TableOrdersService', () => {
             findByShortName: jest.fn(),
           },
         },
+        {
+          provide: KitchenProxyService,
+          useValue: {
+            sendItemsToCook: jest.fn(),
+          },
+        },
       ],
     }).compile();
 
@@ -207,6 +232,7 @@ describe('TableOrdersService', () => {
     model = module.get<Model<TableOrder>>(getModelToken('TableOrder'));
     tablesService = module.get<TablesService>(TablesService);
     menuProxyService = module.get<MenuProxyService>(MenuProxyService);
+    kitchenProxyService = module.get<KitchenProxyService>(KitchenProxyService);
   });
 
   it('should be defined', () => {
@@ -322,6 +348,33 @@ describe('TableOrdersService', () => {
     });
   });
 
+  describe('manageOrderingLine', () => {
+    it('should return ordering line with cooked items', async () => {
+      const mockedOrderingLine = mockOrderingLineList[0];
+      const mockedOrderingLineSentForPrepationList = mockOrderingLineSentForPrepationList[0];
+
+      jest.spyOn(kitchenProxyService, 'sendItemsToCook').mockImplementationOnce(() =>
+        Promise.resolve(mockCookedItems),
+      );
+
+      const orderingLineWithCookedItems = await service.manageOrderingLine(mockedOrderingLine);
+      expect(orderingLineWithCookedItems.orderingLine).toEqual(mockedOrderingLineSentForPrepationList);
+      expect(orderingLineWithCookedItems.cookedItems).toEqual(mockCookedItems);
+    })
+
+    it('should return ordering line with empty cooked items', async () => {
+      const mockedOrderingLineSentForPrepationList = mockOrderingLineSentForPrepationList[0];
+
+      jest.spyOn(kitchenProxyService, 'sendItemsToCook').mockImplementationOnce(() =>
+        Promise.resolve(mockCookedItems),
+      );
+
+      const orderingLineWithCookedItems = await service.manageOrderingLine(mockedOrderingLineSentForPrepationList);
+      expect(orderingLineWithCookedItems.orderingLine).toEqual(mockedOrderingLineSentForPrepationList);
+      expect(orderingLineWithCookedItems.cookedItems).toEqual([]);
+    })
+  });
+
   describe('sendItemsForPreparation', () => {
     it('should send items from tableOrder to preparation', async () => {
       const mockOpened = new Date();
@@ -329,11 +382,21 @@ describe('TableOrdersService', () => {
       jest.spyOn(service, 'findOne').mockImplementationOnce(() =>
         Promise.resolve(mockOpenedTableOrderWithLines),
       );
+      let mockCookedItemsIndex = -1;
+      jest.spyOn(service, 'manageOrderingLine').mockImplementation((orderingLine) => {
+        const cookedItems = [];
+        for (let i = 0; i < orderingLine.howMany; i += 1) {
+          mockCookedItemsIndex += 1;
+          cookedItems.push(mockCookedItems[mockCookedItemsIndex]);
+        }
+        return Promise.resolve({ orderingLine, cookedItems });
+      });
+
       const mockUpdatedTableOrderWithLines = buildMockTableOrder(mockOpened, mockOrderingLineSentForPrepationList);
       jest.spyOn(model, 'findByIdAndUpdate').mockResolvedValueOnce(mockUpdatedTableOrderWithLines);
 
-      const updatedTableOrder = await service.sendItemsForPreparation(mockOpenedTableOrderWithLines._id);
-      expect(updatedTableOrder).toEqual(mockUpdatedTableOrderWithLines);
+      const newCookedItems = await service.sendItemsForPreparation(mockOpenedTableOrderWithLines._id);
+      expect(newCookedItems).toEqual(mockCookedItems);
     });
 
     it('should return TableOrderAlreadyBilledException if tableOrder is already billed', async () => {

@@ -1,4 +1,4 @@
-import { firstValueFrom, Observable } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import { AxiosResponse } from 'axios';
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
@@ -13,16 +13,19 @@ import { OrderingItem } from '../schemas/ordering-item.schema';
 @Injectable()
 export class MenuProxyService {
   private _baseUrl: string;
+
+  private _menusPath = '/menus';
+
   private _menuItemsByShortName: Map<string, MenuItem> = null;
 
   constructor(private configService: ConfigService, private readonly httpService: HttpService) {
     const dependenciesConfig = this.configService.get<DependenciesConfig>('dependencies');
-    this._baseUrl = `http://${dependenciesConfig.menu_service_url_with_port}/menus`;
+    this._baseUrl = `http://${dependenciesConfig.menu_service_url_with_port}`;
   }
 
   private async retrieveFullMenu() {
     if (this._menuItemsByShortName === null) {
-      const retrieveFullMenuCallResponse: AxiosResponse<MenuItem[]> = await firstValueFrom(this.httpService.get(this._baseUrl));
+      const retrieveFullMenuCallResponse: AxiosResponse<MenuItem[]> = await firstValueFrom(this.httpService.get(`${this._baseUrl}${this._menusPath}`));
       this._menuItemsByShortName = _keyBy(retrieveFullMenuCallResponse.data, 'shortName');
     }
   }
