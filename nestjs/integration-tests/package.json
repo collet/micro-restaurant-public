@@ -1,0 +1,20 @@
+{
+  "name": "@fr-univ-cotedazur-restaurant/integration-tests",
+  "version": "0.0.1",
+  "description": "Micro-Service Restaurant: Integration Tests",
+  "author": "Christian Brel <ch.brel@gmail.com>",
+  "private": true,
+  "license": "SEE LICENSE IN <root>/LICENSE",
+  "type": "module",
+  "scripts": {
+    "test:integration": "NODE_OPTIONS='--experimental-vm-modules' jest -c jest.config.js",
+    "test:integration:watch": "NODE_OPTIONS='--experimental-vm-modules' jest -c jest.config.js --watch"
+  },
+  "devDependencies": {
+    "frisby": "^2.1.3",
+    "jest": "^28.1.3"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.1"
+  }
+}
