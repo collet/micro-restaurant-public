@@ -34,6 +34,8 @@
   This service is coupled to menu to get the menu entries, and to kitchen to send the orders to be prepared one the ordering is done.
 * `kitchen-service` (deployed on `http://localhost:3002/kitchen` with API doc at `doc/kitchen`): implements the kitchen context, receiving batches of items to be cooked and served back.
 
+* `integration-tests`: a specific service that run end to end tests at the API level through frisby after docker-composing the other services.
+
 ##  Common implementation stack
 
 The tech stack is based on:
@@ -43,7 +45,7 @@ The tech stack is based on:
 * MongoDB 4.4.15
 * Docker Engine 20.10+
 * Docker Compose 2.6+
-* Unit-tests, Component-tests with Jest 28.1.2, Supertest 6.1.3 (see `package.json`)
+* Unit-tests, Component-tests with Jest 28.1.2, Supertest 6.1.3, frisby 2.1.3 (see `package.json`)
 
 Each service is dockerized with its DB. The following scripts are provided:
 * `build.sh` compiles and containerizes the service

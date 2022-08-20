@@ -3,7 +3,7 @@ import {
   getDiningServiceBaseUrl,
 } from '../config/config.js';
 
-import { Table } from '../dto/table.dto.js';
+import { TableValidator } from '../validators/table.validator.js';
 
 describe('Dining Service', () => {
   let baseUrl;
@@ -20,7 +20,7 @@ describe('Dining Service', () => {
         return frisby
           .get(`${baseUrl}${routePath}`)
           .expect("status", 200)
-          .expect("jsonTypesStrict", "*", Table)
+          .expect("jsonTypesStrict", "*", TableValidator)
           .then((res) => {
             expect(res.json.length).toBeGreaterThanOrEqual(3);
           });

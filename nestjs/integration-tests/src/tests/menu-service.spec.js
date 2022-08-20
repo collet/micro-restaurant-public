@@ -3,7 +3,7 @@ import {
   getMenuServiceBaseUrl,
 } from '../config/config.js';
 
-import { MenuItem } from '../dto/menu-item.dto.js';
+import { MenuItemValidator } from '../validators/menu-item.validator.js';
 
 describe('Menu Service', () => {
   let baseUrl;
@@ -20,7 +20,7 @@ describe('Menu Service', () => {
         return frisby
           .get(`${baseUrl}${routePath}`)
           .expect("status", 200)
-          .expect("jsonTypesStrict", "*", MenuItem)
+          .expect("jsonTypesStrict", "*", MenuItemValidator)
           .then((res) => {
             expect(res.json.length).toBeGreaterThanOrEqual(3);
           });

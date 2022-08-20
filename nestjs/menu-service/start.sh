@@ -1,3 +1,5 @@
 #!/bin/bash
 
-docker-compose --file docker-compose-menu.yml up
+echo "starting menu-service"
+docker-compose --env-file ./.env.docker \
+               --file docker-compose-menu.yml up

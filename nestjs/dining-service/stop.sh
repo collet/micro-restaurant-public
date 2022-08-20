@@ -1,3 +1,5 @@
 #!/bin/bash
 
-docker-compose --file docker-compose-dining.yml down
+echo "stopping dining-service"
+docker-compose --env-file ./.env.docker \
+               --file docker-compose-dining-alone.yml down
