@@ -83,7 +83,7 @@ public class DiningController {
 
     @PostMapping("/{tableOrderId}/bill")
     public ResponseEntity<TableOrder> bill(@PathVariable("tableOrderId") UUID tableOrderId)
-            throws TableOrderIdNotFoundException, TableOrderAlreadyBilledException {
+            throws TableOrderIdNotFoundException, TableOrderAlreadyBilledException, TableIdNotFoundException {
         TableOrder tableOrder = diningRoom.retrieveTableOrder(tableOrderId);
         return ResponseEntity.ok(diningRoom.billOrderOnTable(tableOrder));
     }

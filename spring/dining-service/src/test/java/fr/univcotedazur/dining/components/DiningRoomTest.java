@@ -23,6 +23,7 @@ import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -137,9 +138,13 @@ class DiningRoomTest {
     void billOrderOnTableOrder() throws Exception {
         TableOrder returnedOrder = diningRoom.addNewItemOnTableOrder(order1,pizza,4);
         diningRoom.sendItemsForPreparation(returnedOrder);
+        Table tableBeforeBilling = tableRepository.findByNumber(returnedOrder.getTableNumber()).get();
+        assertThat(tableBeforeBilling.isTaken(), is(true));
         returnedOrder = diningRoom.billOrderOnTable(returnedOrder);
         assertNotNull(returnedOrder.getBilled());
         assertThat(returnedOrder.getLines().get(0).isSentForPreparation(),equalTo(true));
+        Table tableAfterBilling = tableRepository.findByNumber(returnedOrder.getTableNumber()).get();
+        assertThat(tableAfterBilling.isTaken(), is(false));
     }
 
     @Test

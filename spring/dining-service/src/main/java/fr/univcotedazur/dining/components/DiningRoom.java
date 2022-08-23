@@ -68,13 +68,14 @@ public class DiningRoom {
         return tableOrderRepository.findAll();
     }
 
-    public TableOrder billOrderOnTable(TableOrder tableOrder) throws TableOrderAlreadyBilledException {
+    public TableOrder billOrderOnTable(TableOrder tableOrder) throws TableOrderAlreadyBilledException, TableIdNotFoundException {
         if (tableOrder.getBilled() != null) {
             throw new TableOrderAlreadyBilledException(tableOrder.getTableNumber(), tableOrder.getId());
         } else {
             tableOrder.setBilled(LocalDateTime.now());
             System.err.println("TODO: send payment for the tableOrder" + tableOrder.getId() + " on table " +
                     tableOrder.getTableNumber());
+            tablesLayout.freeTable(tablesLayout.retrieveTable(tableOrder.getTableNumber()));
             return tableOrderRepository.save(tableOrder);
         }
     }

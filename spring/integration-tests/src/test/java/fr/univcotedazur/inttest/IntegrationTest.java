@@ -82,6 +82,14 @@ class IntegrationTest {
 
     @Test
     public void theFullOrderingTest() throws Exception {
+        given()
+                .spec(diningSpec).
+                when().
+                get(TABLES + "/1").
+                then()
+                .statusCode(HttpStatus.SC_OK)
+                .assertThat()
+                .body("taken", is(false));
         JSONObject createTableParams = new JSONObject();
         createTableParams.put("tableId","1");
         createTableParams.put("customersCount", "6");
@@ -111,6 +119,14 @@ class IntegrationTest {
                 then()
                 .statusCode(HttpStatus.SC_CREATED)
                 .body("id", equalTo(orderId.toString()));
+        given()
+                .spec(diningSpec).
+                when().
+                get(TABLES + "/1").
+                then()
+                .statusCode(HttpStatus.SC_OK)
+                .assertThat()
+                .body("taken", is(true));
         JSONObject ordering3cokes = new JSONObject();
         ordering3cokes.put("shortName","coke");
         ordering3cokes.put("id", menuItemDTOMap.get("coke").toString());
@@ -174,6 +190,14 @@ class IntegrationTest {
                 then()
                 .statusCode(HttpStatus.SC_OK)
                 .body("billed",notNullValue());
+        given()
+                .spec(diningSpec).
+                when().
+                get(TABLES + "/1").
+                then()
+                .statusCode(HttpStatus.SC_OK)
+                .assertThat()
+                .body("taken", is(false));
         given()
                 .spec(diningSpec).
                 when()
