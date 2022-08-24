@@ -1,0 +1,18 @@
+version: "3"
+
+services:
+  dining-service:
+    image: "restaurant/dining-service"
+    restart: always
+    ports:
+      - 3001:8080
+    depends_on:
+      - mongo_db_dining
+    environment:
+      - MENU_WITH_PORT=${MENU_SERVICE}:8080
+      - KITCHEN_WITH_PORT=${KITCHEN_SERVICE}:8080
+  mongo_db_dining:
+    image: ${MONGO_IMAGE}
+    restart: always
+    ports:
+      - 27018:27017

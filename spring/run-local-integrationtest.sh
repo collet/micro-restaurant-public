@@ -2,9 +2,7 @@
 
 echo "Running IT test WITH NO PRIOR BUILD"
 echo "Starting the full docker-compose in background"
-./start-all.sh &
-echo "Waiting for 10 sec"
-sleep 10
+./start-all.sh
 echo "Running integration-tests with maven"
 cd integration-tests
 mvn clean test

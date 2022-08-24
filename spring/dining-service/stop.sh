@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker-compose --file docker-compose-dining.yml down
+docker-compose --file docker-compose-dining-alone.yml down
