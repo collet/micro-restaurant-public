@@ -32,9 +32,9 @@
 * `menu-service` (deployed on `http://localhost:3000/menus` with API doc at `/doc/menus`): implements the content of the menu, which could be used to display it, checks consistency with other services using the menu items.
 * `dining-service` (deployed on `http://localhost:3001/tables and /tableOrders` with API doc at `doc/dining`): implements the dining room context, with table management, and ordering at the table level. 
 This service is coupled to menu to get the menu entries, and to kitchen to send the orders to be prepared one the ordering is done.
-* `kitchen-service` (deployed on `http://localhost:3002/kitchen` with API doc at `doc/kitchen`): implements the kitchen context, receiving btaches of items to be cooked and served back.
+* `kitchen-service` (deployed on `http://localhost:3002/cookedItems` with API doc at `doc/kitchen`): implements the kitchen context, receiving btaches of items to be cooked and served back.
 
-* `integration-tests`: a specific service that run end to end tests at the API level through Rest-Assured after docker-composing the other services (maven execution for running tests over localhost deployments).
+* `integration-tests`: a specific service that run end-to-end tests at the API level through Rest-Assured after docker-composing the other services (maven execution for running tests over localhost deployments).
 
 ##  Common implementation stack
 
@@ -48,7 +48,7 @@ The tech stack is based on:
 
 Each service is dockerized with its DB. The following scripts are provided:
 * `build.sh` compiles and containerizes the service
-* `start.sh` runs it through docker compose
+* `start.sh` runs it through docker compose (composing only the service and its DB)
 * `stop.sh` puts down the docker composition
 *but the start/stop scripts were developed for the MVP. the "all" version below should be used.*
 
