@@ -28,7 +28,7 @@ class IntegrationTest {
     RequestSpecification kitchenSpec;
     final static String TABLES = "/tables";
     final static String ORDERS = "/tableOrders";
-    final static String KITCHEN = "/kitchen";
+    final static String KITCHEN = "/cookedItems";
     Map<String,UUID> menuItemDTOMap;
 
     @BeforeEach

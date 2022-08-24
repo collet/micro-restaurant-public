@@ -27,7 +27,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequestMapping(path = KitchenController.BASE_URI, produces = APPLICATION_JSON_VALUE)
 public class KitchenController {
 
-    public static final String BASE_URI = "/kitchen";
+    public static final String BASE_URI = "/cookedItems";
 
     @Autowired
     RecipeRepository recipeRepository;

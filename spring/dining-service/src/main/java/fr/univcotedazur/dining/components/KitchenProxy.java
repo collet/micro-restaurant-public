@@ -17,7 +17,7 @@ public class KitchenProxy {
     private RestTemplate restTemplate = new RestTemplate();
 
     public List<CookedItem> sendCookingOrderToKitchen(ItemsToBeCookedInKitchen itemsToBeCookedInKitchen) {
-        return Arrays.asList(restTemplate.postForEntity(kitchenHostandPort +"/kitchen",
+        return Arrays.asList(restTemplate.postForEntity(kitchenHostandPort +"/cookedItems",
                              itemsToBeCookedInKitchen, CookedItem[].class).getBody());
     }
 
