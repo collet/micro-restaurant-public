@@ -9,6 +9,7 @@ import org.apache.http.HttpStatus;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.HashMap;
@@ -26,22 +27,32 @@ class IntegrationTest {
     RequestSpecification menusSpec;
     RequestSpecification diningSpec;
     RequestSpecification kitchenSpec;
+    final static String MENUS = "/menus";
     final static String TABLES = "/tables";
     final static String ORDERS = "/tableOrders";
     final static String KITCHEN = "/cookedItems";
     Map<String,UUID> menuItemDTOMap;
 
+    @Value("${menu.route:}")
+    private String menuRoute;
+
+    @Value("${dining.route:}")
+    private String diningRoute;
+
+    @Value("${kitchen.route:}")
+    private String kitchenRoute;
+
     @BeforeEach
     public void configureRestAssured() {
         menusSpec = new RequestSpecBuilder().
                 setAccept(ContentType.JSON).setContentType(ContentType.JSON).
-                setBaseUri("http://localhost:3000/menus").build();
+                setBaseUri(menuRoute + MENUS).build();
         diningSpec = new RequestSpecBuilder().
                 setAccept(ContentType.JSON).setContentType(ContentType.JSON).
-                setBaseUri("http://localhost:3001").build();
+                setBaseUri(diningRoute).build();
         kitchenSpec = new RequestSpecBuilder().
                 setAccept(ContentType.JSON).setContentType(ContentType.JSON).
-                setBaseUri("http://localhost:3002").build();
+                setBaseUri(kitchenRoute).build();
         List<MenuItemDTO> menuItemDTOList =
                 given()
                         .spec(menusSpec).

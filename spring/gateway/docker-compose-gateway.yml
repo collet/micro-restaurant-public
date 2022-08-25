@@ -1,0 +1,12 @@
+version: "3"
+
+services:
+  gateway:
+    image: "restaurant/gateway"
+    restart: always
+    ports:
+      - 9500:8080
+    depends_on:
+      - ${MENU_SERVICE}
+      - ${KITCHEN_SERVICE}
+      - ${DINING_SERVICE}

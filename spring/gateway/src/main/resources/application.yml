@@ -1,0 +1,22 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: menu-service
+          uri: http://menu-service:8080
+          predicates:
+            - Path=/menu/**
+          filters:
+            - RewritePath=/menu(?<segment>/?.*), $\{segment}
+        - id: dining-service
+          uri: http://dining-service:8080
+          predicates:
+            - Path=/dining/**
+          filters:
+            - RewritePath=/dining(?<segment>/?.*), $\{segment}
+        - id: kitchen-service
+          uri: http://kitchen-service:8080
+          predicates:
+            - Path=/kitchen/**
+          filters:
+            - RewritePath=/kitchen(?<segment>/?.*), $\{segment}

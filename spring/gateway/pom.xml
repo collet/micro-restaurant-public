@@ -8,28 +8,41 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>integration-tests</artifactId>
+    <artifactId>gateway</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+
+    <properties>
+        <spring-cloud.version>2021.0.3</spring-cloud.version>
+    </properties>
 
     <dependencies>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
+            <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>
-
         <dependency>
-            <groupId>io.rest-assured</groupId>
-            <artifactId>rest-assured</artifactId>
-            <scope>test</scope>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-gateway</artifactId>
         </dependency>
 
     </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <plugins>
@@ -40,18 +53,4 @@
         </plugins>
     </build>
 
-    <profiles>
-        <profile>
-            <id>gateway</id>
-            <properties>
-                <activatedProperties>gateway</activatedProperties>
-            </properties>
-        </profile>
-        <profile>
-            <id>direct</id>
-            <properties>
-                <activatedProperties>direct</activatedProperties>
-            </properties>
-        </profile>
-    </profiles>
 </project>

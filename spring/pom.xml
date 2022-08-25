@@ -32,6 +32,7 @@
         <module>dining-service</module>
         <module>kitchen-service</module>
         <module>integration-tests</module>
+        <module>gateway</module>
     </modules>
 
     <dependencyManagement>
