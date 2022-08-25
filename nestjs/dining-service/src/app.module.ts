@@ -10,6 +10,7 @@ import dependenciesConfig from './shared/config/dependencies.config';
 import { MongooseConfigService } from './shared/services/mongoose-config.service';
 import { StartupLogicService } from './shared/services/startup-logic.service';
 
+import { HealthModule } from './health/health.module';
 import { TablesModule } from './tables/tables.module';
 import { TableOrdersModule } from './table-orders/table-orders.module';
 
@@ -22,6 +23,7 @@ import { TableOrdersModule } from './table-orders/table-orders.module';
     MongooseModule.forRootAsync({
       useClass: MongooseConfigService,
     }),
+    HealthModule,
     TablesModule,
     TableOrdersModule,
   ],

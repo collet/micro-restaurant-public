@@ -26,6 +26,9 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup(swaggeruiConfig.path, app, document);
 
+  // Starts listening for shutdown hooks
+  app.enableShutdownHooks();
+
   // Run the app
   const appPort = configService.get('app.port');
   await app.listen(appPort);
