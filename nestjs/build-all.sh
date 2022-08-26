@@ -15,5 +15,7 @@ compile_dir "dining-service"
 
 compile_dir "kitchen-service"
 
+compile_dir "gateway"
+
 echo "** Done all"
 

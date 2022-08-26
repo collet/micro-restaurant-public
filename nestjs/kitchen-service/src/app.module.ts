@@ -10,6 +10,7 @@ import { MongooseConfigService } from './shared/services/mongoose-config.service
 
 import { StartupLogicService } from './shared/services/startup-logic.service';
 
+import { HealthModule } from './health/health.module';
 import { CookedItemsModule } from './cookedItems/cooked-items.module';
 
 @Module({
@@ -21,6 +22,7 @@ import { CookedItemsModule } from './cookedItems/cooked-items.module';
     MongooseModule.forRootAsync({
       useClass: MongooseConfigService,
     }),
+    HealthModule,
     CookedItemsModule,
   ],
   providers: [StartupLogicService],

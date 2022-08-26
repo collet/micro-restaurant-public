@@ -1,5 +1,9 @@
 #!/bin/bash
 
+source ../framework.sh
+
 echo "starting kitchen-service"
 docker-compose --env-file ./.env.docker \
-               --file docker-compose-kitchen.yml up
+               --file docker-compose-kitchen.yml up -d
+
+wait_on_health http://localhost:3002 ${PWD##*/}
