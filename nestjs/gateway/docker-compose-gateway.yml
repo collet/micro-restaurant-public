@@ -1,0 +1,21 @@
+version: "3"
+
+services:
+  gateway:
+    image: "nestjs-restaurant/gateway"
+    restart: always
+    ports:
+      - 9500:3000
+    depends_on:
+      - ${MENU_SERVICE}
+      - ${KITCHEN_SERVICE}
+      - ${DINING_SERVICE}
+    environment:
+      - MENU_SERVICE_URL_WITH_PORT=${MENU_SERVICE}:3000
+      - KITCHEN_SERVICE_URL_WITH_PORT=${KITCHEN_SERVICE}:3000
+      - DINING_SERVICE_URL_WITH_PORT=${DINING_SERVICE}:3000
+    networks:
+      - nestjs-restaurant-network
+networks:
+  nestjs-restaurant-network:
+    driver: bridge

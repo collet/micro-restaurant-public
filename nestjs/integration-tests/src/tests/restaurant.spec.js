@@ -36,6 +36,10 @@ describe('Restaurant', () => {
     menuBaseUrl = getMenuServiceBaseUrl();
     diningBaseUrl = getDiningServiceBaseUrl();
     kitchenBaseUrl = getKitchenServiceBaseUrl();
+
+    console.log('Using: menuBaseUrl', menuBaseUrl);
+    console.log('Using: diningBaseUrl', diningBaseUrl);
+    console.log('Using: kitchenBaseUrl', kitchenBaseUrl);
   });
 
   describe('a full ordering', () => {

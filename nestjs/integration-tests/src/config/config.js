@@ -1,5 +1,11 @@
-import 'dotenv/config';
+import dotenv from 'dotenv'
 import frisbyInstance from 'frisby';
+
+if (process.env.PROFILE !== undefined) {
+  dotenv.config({ path: `.env.${process.env.PROFILE}` });
+} else {
+  dotenv.config();
+}
 
 frisbyInstance.globalSetup({
   request: {
