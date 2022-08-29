@@ -22,6 +22,8 @@ async function bootstrap() {
     .setTitle(swaggeruiConfig.title)
     .setDescription(swaggeruiConfig.description)
     .setVersion(configService.get('npm_package_version'))
+    .addServer('/', 'Without gateway')
+    .addServer('/kitchen', 'Through gateway')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup(swaggeruiConfig.path, app, document);
