@@ -5,7 +5,6 @@ import fr.univcotedazur.dining.repositories.TableRepository;
 import io.restassured.http.ContentType;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
 import org.apache.http.HttpStatus;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,8 +21,8 @@ import org.testcontainers.utility.DockerImageName;
 
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.when;
-import static org.hamcrest.Matchers.is;
 import static fr.univcotedazur.dining.controllers.TableController.BASE_URI;
+import static org.hamcrest.Matchers.*;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -73,7 +72,8 @@ public class TableControllerTest {
                 then()
                 .statusCode(HttpStatus.SC_CREATED)
                 .body("number", is(124)) // Rest Assured parsed back an int, not a long
-                .body("taken", is(false));
+                .body("taken", is(false))
+                .body("tableOrderId",is(nullValue()));
         given()
                 .contentType(ContentType.JSON).body(table1).
                 when()

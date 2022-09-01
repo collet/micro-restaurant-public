@@ -1,7 +1,9 @@
 package fr.univcotedazur.dining.controllers;
 
+import fr.univcotedazur.dining.components.DiningRoom;
 import fr.univcotedazur.dining.components.TablesLayout;
 import fr.univcotedazur.dining.controllers.dto.TableCreationDTO;
+import fr.univcotedazur.dining.controllers.dto.TableWithOrderDTO;
 import fr.univcotedazur.dining.exceptions.TableAlreadyExistingException;
 import fr.univcotedazur.dining.exceptions.TableIdNotFoundException;
 import fr.univcotedazur.dining.models.Table;
@@ -24,20 +26,23 @@ public class TableController {
     @Autowired
     private TablesLayout tablesLayout;
 
+    @Autowired
+    private DiningRoom diningRoom;
+
     @PostMapping()
-    public ResponseEntity<Table> createTable(@RequestBody @Valid TableCreationDTO tableCreationDTO) throws TableAlreadyExistingException {
+    public ResponseEntity<TableWithOrderDTO> createTable(@RequestBody @Valid TableCreationDTO tableCreationDTO) throws TableAlreadyExistingException {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(tablesLayout.addTable(tableCreationDTO.getTableId()));
+                .body(diningRoom.tableWithOrderDTOFactory(tablesLayout.addTable(tableCreationDTO.getTableId())));
     }
 
     @GetMapping
-    public ResponseEntity<List<Table>> listAllTables() {
-        return ResponseEntity.ok(tablesLayout.findAll());
+    public ResponseEntity<List<TableWithOrderDTO>> listAllTables() {
+        return ResponseEntity.ok(tablesLayout.findAll().stream().map(table -> diningRoom.tableWithOrderDTOFactory(table)).toList());
     }
 
     @GetMapping(path="/{tableId}")
-    public ResponseEntity<Table> findTableByNumber(@PathVariable("tableId") Long tableId) throws TableIdNotFoundException {
-        return ResponseEntity.ok(tablesLayout.retrieveTable(tableId));
+    public ResponseEntity<TableWithOrderDTO> findTableByNumber(@PathVariable("tableId") Long tableId) throws TableIdNotFoundException {
+        return ResponseEntity.ok(diningRoom.tableWithOrderDTOFactory(tablesLayout.retrieveTable(tableId)));
     }
 
 }

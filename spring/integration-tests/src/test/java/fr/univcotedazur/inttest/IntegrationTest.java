@@ -100,7 +100,8 @@ class IntegrationTest {
                 then()
                 .statusCode(HttpStatus.SC_OK)
                 .assertThat()
-                .body("taken", is(false));
+                .body("taken", is(false))
+                .body("tableOrderId",is(nullValue()));
         JSONObject createTableParams = new JSONObject();
         createTableParams.put("tableId","1");
         createTableParams.put("customersCount", "6");
@@ -118,6 +119,15 @@ class IntegrationTest {
                 .body("opened", notNullValue())
                 .body("billed", nullValue())
                 .extract().jsonPath().getUUID("id");
+        given()
+                .spec(diningSpec).
+                when().
+                get(TABLES + "/1").
+                then()
+                .statusCode(HttpStatus.SC_OK)
+                .assertThat()
+                .body("taken", is(true))
+                .body("tableOrderId",equalTo(orderId.toString()));
         JSONObject ordering2pizzas = new JSONObject();
         ordering2pizzas.put("shortName","pizza");
         ordering2pizzas.put("id", menuItemDTOMap.get("pizza").toString());
@@ -208,7 +218,8 @@ class IntegrationTest {
                 then()
                 .statusCode(HttpStatus.SC_OK)
                 .assertThat()
-                .body("taken", is(false));
+                .body("taken", is(false))
+                .body("tableOrderId",is(nullValue()));
         given()
                 .spec(diningSpec).
                 when()

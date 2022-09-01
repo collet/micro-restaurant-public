@@ -1,5 +1,6 @@
 package fr.univcotedazur.dining.components;
 
+import fr.univcotedazur.dining.controllers.dto.TableWithOrderDTO;
 import fr.univcotedazur.dining.models.CookedItem;
 import fr.univcotedazur.dining.components.dto.ItemsToBeCookedInKitchen;
 import fr.univcotedazur.dining.exceptions.*;
@@ -58,6 +59,18 @@ public class DiningRoom {
             return tableOrderRepository.findOpenTableOrders().stream()
                     .filter(tOrder -> tOrder.getBilled() == null).findFirst().get();
         }
+    }
+
+    public TableWithOrderDTO tableWithOrderDTOFactory(Table table) {
+        TableWithOrderDTO tableWithOrderDTO = new TableWithOrderDTO();
+        tableWithOrderDTO.setNumber(table.getNumber());
+        tableWithOrderDTO.setTaken(table.isTaken());
+        try {
+            tableWithOrderDTO.setTableOrderId(currentTableOrderOnTable(table).getId());
+        } catch (TableNotTakenException e) {
+            tableWithOrderDTO.setTableOrderId(null);
+        }
+        return tableWithOrderDTO;
     }
 
     public List<TableOrder> findAllOpenTableOrders() {
