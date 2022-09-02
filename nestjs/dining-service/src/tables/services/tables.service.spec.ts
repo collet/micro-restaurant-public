@@ -7,14 +7,18 @@ import { Table } from '../schemas/table.schema';
 
 import { AddTableDto } from '../dto/add-table.dto';
 
+import { TablesWithOrderService } from '../../tables-with-order/services/tables-with-order.service';
+
 import { TableNumberNotFoundException } from '../exceptions/table-number-not-found.exception';
 import { TableAlreadyExistsException } from '../exceptions/table-already-exists.exception';
 import { TableAlreadyTakenException } from '../exceptions/table-already-taken.exception';
 import { TableAlreadyFreeException } from '../exceptions/table-already-free.exception';
 
+
 describe('TablesService', () => {
   let service: TablesService;
   let model: Model<Table>;
+  let tablesWithOrderService: TablesWithOrderService;
 
   let addTableDto: AddTableDto;
   let mockTable;
@@ -30,25 +34,33 @@ describe('TablesService', () => {
       _id: 'table id',
       number: 12,
       taken: false,
+      tableOrderId: null,
     };
 
     mockTakenTable = {
       ...mockTable,
       taken: true,
+      tableOrderId: 'table order id',
     };
 
     mockTableList = [
       {
+        _id: 'table id 1',
         number: 1,
         taken: false,
+        tableOrderId: null,
       },
       {
+        _id: 'table id 2',
         number: 2,
         taken: false,
+        tableOrderId: null,
       },
       {
+        _id: 'table id 3',
         number: 3,
         taken: false,
+        tableOrderId: null,
       },
     ];
 
@@ -67,11 +79,18 @@ describe('TablesService', () => {
             findByIdAndUpdate: jest.fn(),
           },
         },
+        {
+          provide: TablesWithOrderService,
+          useValue: {
+            tableToTableWithOrder: jest.fn(),
+          },
+        },
       ],
     }).compile();
 
     service = module.get<TablesService>(TablesService);
     model = module.get<Model<Table>>(getModelToken('Table'));
+    tablesWithOrderService = module.get<TablesWithOrderService>(TablesWithOrderService);
   });
 
   it('should be defined', () => {
@@ -83,8 +102,10 @@ describe('TablesService', () => {
       jest.spyOn(model, 'find').mockReturnValue({
         lean: jest.fn().mockResolvedValueOnce(mockTableList),
       } as any);
+      jest.spyOn(tablesWithOrderService, 'tableToTableWithOrder').mockImplementation((table) => mockTableList[table.number - 1]);
       const tables = await service.findAll();
       expect(tables).toEqual(mockTableList);
+      expect(tablesWithOrderService.tableToTableWithOrder).toHaveBeenCalledTimes(mockTableList.length);
     });
   });
 
@@ -93,8 +114,10 @@ describe('TablesService', () => {
       jest.spyOn(model, 'findOne').mockReturnValue({
         lean: jest.fn().mockResolvedValueOnce(mockTable),
       } as any);
+      jest.spyOn(tablesWithOrderService, 'tableToTableWithOrder').mockResolvedValueOnce(mockTable);
       const table = await service.findByNumber(12);
       expect(table).toEqual(mockTable);
+      expect(tablesWithOrderService.tableToTableWithOrder).toHaveBeenCalledTimes(1);
     });
 
     it('should return TableNumberNotFoundException if the searched table is not found', async () => {
@@ -114,8 +137,10 @@ describe('TablesService', () => {
       jest.spyOn(model, 'create').mockImplementationOnce(() =>
         Promise.resolve(mockTable),
       );
+      jest.spyOn(tablesWithOrderService, 'tableToTableWithOrder').mockResolvedValueOnce(mockTable);
       const newTable = await service.create(addTableDto);
       expect(newTable).toEqual(mockTable);
+      expect(tablesWithOrderService.tableToTableWithOrder).toHaveBeenCalledTimes(1);
     });
 
     it('should return TableAlreadyExistsException if table already exists', async () => {

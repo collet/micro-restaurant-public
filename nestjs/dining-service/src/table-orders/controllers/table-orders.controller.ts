@@ -39,7 +39,7 @@ export class TableOrdersController {
   @ApiNotFoundResponse({ type: TableNumberNotFoundException, description: 'Table not found' })
   @ApiUnprocessableEntityResponse({ type: TableAlreadyTakenException, description: 'Table is already taken' })
   @Post()
-  async openTable(@Body() startOrderingDto: StartOrderingDto) {
+  async openTable(@Body() startOrderingDto: StartOrderingDto): Promise<TableOrder> {
     return await this.tableOrdersService.startOrdering(startOrderingDto);
   }
 

@@ -9,9 +9,8 @@ import {
 } from '@nestjs/swagger';
 
 import { AddTableDto } from '../dto/add-table.dto';
+import { TableWithOrderDto } from '../../tables-with-order/dto/table-with-order.dto';
 import { GetTableParams } from '../params/get-table.params';
-
-import { Table } from '../schemas/table.schema';
 
 import { TableAlreadyExistsException } from '../exceptions/table-already-exists.exception';
 import { TableNumberNotFoundException } from '../exceptions/table-number-not-found.exception';
@@ -23,25 +22,25 @@ import { TablesService } from '../services/tables.service';
 export class TablesController {
   constructor(private readonly tablesService: TablesService) {}
 
-  @ApiOkResponse({ type: Table, isArray: true })
+  @ApiOkResponse({ type: TableWithOrderDto, isArray: true })
   @Get()
-  async listAllTables(): Promise<Table[]> {
+  async listAllTables(): Promise<TableWithOrderDto[]> {
     return this.tablesService.findAll();
   }
 
   @ApiParam({ name: 'tableNumber' })
-  @ApiOkResponse({ type: Table })
+  @ApiOkResponse({ type: TableWithOrderDto })
   @ApiNotFoundResponse({ type: TableNumberNotFoundException, description: 'Table not found' })
   @Get(':tableNumber')
-  async getTableByNumber(@Param() getTableParams: GetTableParams): Promise<Table> {
+  async getTableByNumber(@Param() getTableParams: GetTableParams): Promise<TableWithOrderDto> {
     return this.tablesService.findByNumber(getTableParams.tableNumber);
   }
 
   @ApiBody({ type: AddTableDto })
-  @ApiCreatedResponse({ type: Table, description: 'The table has been successfully added.' })
+  @ApiCreatedResponse({ type: TableWithOrderDto, description: 'The table has been successfully added.' })
   @ApiConflictResponse({ type: TableAlreadyExistsException, description: 'Table already exists' })
   @Post()
-  async addTable(@Body() addTableDto: AddTableDto) {
+  async addTable(@Body() addTableDto: AddTableDto): Promise<TableWithOrderDto> {
     return await this.tablesService.create(addTableDto);
   }
 }
