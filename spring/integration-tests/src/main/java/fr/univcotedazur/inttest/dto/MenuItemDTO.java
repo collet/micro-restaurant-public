@@ -12,6 +12,8 @@ public class MenuItemDTO {
 
         private double price;
 
+        private String category; // read the Category as a String (like in dining service)
+
         public UUID getId() {
                 return id;
         }
@@ -42,5 +44,13 @@ public class MenuItemDTO {
 
         public void setPrice(double price) {
                 this.price = price;
+        }
+
+        public String getCategory() {
+                return category;
+        }
+
+        public void setCategory(String category) {
+                this.category = category;
         }
 }

@@ -20,6 +20,9 @@ public class MenuItem {
         @Positive
         private double price; // in euro
 
+        @NotBlank
+        private Category category;
+
         public UUID getId() {
                 return id;
         }
@@ -50,6 +53,14 @@ public class MenuItem {
 
         public void setPrice(double price) {
                 this.price = price;
+        }
+
+        public Category getCategory() {
+                return category;
+        }
+
+        public void setCategory(Category category) {
+                this.category = category;
         }
 
 }
