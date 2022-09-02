@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { HttpModule } from '@nestjs/axios';
 
@@ -11,6 +11,7 @@ import { KitchenProxyService } from './services/kitchen-proxy.service';
 
 import { TablesModule } from '../tables/tables.module';
 
+@Global()
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: TableOrder.name, schema: TableOrderSchema }]),

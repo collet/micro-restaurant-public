@@ -5,36 +5,49 @@ import { Model } from 'mongoose';
 import { Table, TableDocument } from '../schemas/table.schema';
 
 import { AddTableDto } from '../dto/add-table.dto';
+import { TableWithOrderDto } from '../../tables-with-order/dto/table-with-order.dto';
 
 import { TableAlreadyExistsException } from '../exceptions/table-already-exists.exception';
 import { TableNumberNotFoundException } from '../exceptions/table-number-not-found.exception';
 import { TableAlreadyTakenException } from '../exceptions/table-already-taken.exception';
 import { TableAlreadyFreeException } from '../exceptions/table-already-free.exception';
+import { TablesWithOrderService } from '../../tables-with-order/services/tables-with-order.service';
 
 @Injectable()
 export class TablesService {
-  constructor(@InjectModel(Table.name) private tableModel: Model<TableDocument>) {}
+  constructor(
+    @InjectModel(Table.name) private tableModel: Model<TableDocument>,
+    private readonly tablesWithOrderService: TablesWithOrderService,
+  ) {}
 
-  async findAll(): Promise<Table[]> {
-    return this.tableModel.find().lean();
+  async findAll(): Promise<TableWithOrderDto[]> {
+    const allTables: Table[] = await this.tableModel.find().lean();
+
+    const allTablesWithOrder = allTables.map((table) => (
+      this.tablesWithOrderService.tableToTableWithOrder(table)
+    ));
+
+    return Promise.all(allTablesWithOrder);
   }
 
-  async findByNumber(tableNumber: number): Promise<Table> {
+  async findByNumber(tableNumber: number): Promise<TableWithOrderDto> {
     const foundItem = await this.tableModel.findOne({ number: tableNumber }).lean();
 
     if (foundItem === null) {
       throw new TableNumberNotFoundException(tableNumber);
     }
 
-    return foundItem;
+    return this.tablesWithOrderService.tableToTableWithOrder(foundItem);
   }
 
-  async create(addTableDto: AddTableDto): Promise<Table> {
+  async create(addTableDto: AddTableDto): Promise<TableWithOrderDto> {
     const alreadyExists = await this.tableModel.find({ number: addTableDto.number });
     if (alreadyExists.length > 0) {
       throw new TableAlreadyExistsException(addTableDto.number);
     }
-    return await this.tableModel.create(addTableDto);
+    const newTable: Table = await this.tableModel.create(addTableDto);
+
+    return this.tablesWithOrderService.tableToTableWithOrder(newTable);
   }
 
   async takeTable(tableNumber: number): Promise<Table> {

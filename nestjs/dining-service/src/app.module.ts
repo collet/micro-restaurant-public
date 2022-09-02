@@ -13,6 +13,7 @@ import { StartupLogicService } from './shared/services/startup-logic.service';
 import { HealthModule } from './health/health.module';
 import { TablesModule } from './tables/tables.module';
 import { TableOrdersModule } from './table-orders/table-orders.module';
+import { TablesWithOrderModule } from './tables-with-order/tables-with-order.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { TableOrdersModule } from './table-orders/table-orders.module';
     HealthModule,
     TablesModule,
     TableOrdersModule,
+    TablesWithOrderModule,
   ],
   providers: [StartupLogicService],
 })

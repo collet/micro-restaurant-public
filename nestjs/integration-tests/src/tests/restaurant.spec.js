@@ -96,6 +96,7 @@ describe('Restaurant', () => {
         .expect("jsonTypesStrict", TableValidator)
         .then((res) => {
           expect(res.json.taken).toBeTruthy();
+          expect(res.json.tableOrderId).toEqual(currentTableOrder._id);
         });
 
       // Ordering 2 pizzas
@@ -201,6 +202,7 @@ describe('Restaurant', () => {
         .expect("jsonTypesStrict", TableValidator)
         .then((res) => {
           expect(res.json.taken).toBeFalsy();
+          expect(res.json.tableOrderId).toBeNull();
         });
     });
   });

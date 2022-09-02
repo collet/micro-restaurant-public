@@ -9,6 +9,9 @@ import { OrderingLine } from '../schemas/ordering-line.schema';
 
 import { StartOrderingDto } from '../dto/start-ordering.dto';
 import { AddMenuItemDto } from '../dto/add-menu-item.dto';
+import { CookedItemDto } from '../dto/cooked-item.dto';
+
+import { OrderingLineWithCookedItems } from '../interfaces/ordering-line-with-cooked-items.interface';
 
 import { TablesService } from '../../tables/services/tables.service';
 import { MenuProxyService } from './menu-proxy.service';
@@ -17,8 +20,6 @@ import { KitchenProxyService } from './kitchen-proxy.service';
 import { TableOrderIdNotFoundException } from '../exceptions/table-order-id-not-found.exception';
 import { AddMenuItemDtoNotFoundException } from '../exceptions/add-menu-item-dto-not-found.exception';
 import { TableOrderAlreadyBilledException } from '../exceptions/table-order-already-billed.exception';
-import { CookedItemDto } from '../dto/cooked-item.dto';
-import { OrderingLineWithCookedItems } from '../interfaces/ordering-line-with-cooked-items.interface';
 
 @Injectable()
 export class TableOrdersService {
