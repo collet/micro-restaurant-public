@@ -2,6 +2,8 @@ package fr.univcotedazur.inttest;
 
 import fr.univcotedazur.inttest.dto.CookedItemDTO;
 import fr.univcotedazur.inttest.dto.MenuItemDTO;
+import ij.IJ;
+import ij.ImagePlus;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
@@ -12,6 +14,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,12 +72,14 @@ class IntegrationTest {
     }
 
     @Test
-    public void fullMenuTest() {
+    public void fullMenuTest() throws Exception {
         assertThat("4 items are in the menu", menuItemDTOMap.size() == 4);
         MenuItemDTO lasagna = menuItemDTOMap.get("lasagna");
         assertThat("lasagna is the menu", lasagna != null);
         assertThat("lasagna has the right price", lasagna.getPrice() == 16d);
         assertThat("lasagna is in the right category", lasagna.getCategory().equals("MAIN"));
+        ImagePlus lasagnaImage = IJ.openImage(lasagna.getImage().toString());
+        assertThat("lasagna image can be retrieved", lasagnaImage.getWidth() == 1280);
     }
 
     @Test

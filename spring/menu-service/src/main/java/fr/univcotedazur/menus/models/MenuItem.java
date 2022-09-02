@@ -4,6 +4,7 @@ import org.springframework.data.annotation.Id;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
+import java.net.URL;
 import java.util.UUID;
 
 public class MenuItem {
@@ -22,6 +23,9 @@ public class MenuItem {
 
         @NotBlank
         private Category category;
+
+        @NotBlank
+        private URL image;
 
         public UUID getId() {
                 return id;
@@ -63,4 +67,11 @@ public class MenuItem {
                 this.category = category;
         }
 
+        public URL getImage() {
+                return image;
+        }
+
+        public void setImage(URL image) {
+                this.image = image;
+        }
 }

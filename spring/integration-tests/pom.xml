@@ -29,6 +29,13 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>net.imagej</groupId>
+            <artifactId>ij</artifactId>
+            <version>1.53t</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
