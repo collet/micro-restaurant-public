@@ -6,4 +6,5 @@ export const MenuItemValidator = Joi.object({
   shortName: Joi.string().required(),
   price: Joi.number().min(0).required(),
   category: Joi.string().required(),
+  image: Joi.string().allow(null),
 });

@@ -42,12 +42,32 @@ describe('StartupLogicService', () => {
     const mockShortName = 'my shortName';
     const mockPrice = 8;
     const mockCategory = CategoryEnum.MAIN;
+    const mockImage = 'http://example.org/myimage.jpg';
 
     const menuItem: AddMenuItemDto = new AddMenuItemDto();
     menuItem.fullName = mockFullName;
     menuItem.shortName = mockShortName;
     menuItem.price = mockPrice;
     menuItem.category = mockCategory;
+    menuItem.image = mockImage;
+
+    const addMenuItem = service.createMenuItem(mockFullName, mockShortName, mockPrice, mockCategory, mockImage);
+    expect(addMenuItem).toEqual(menuItem);
+  });
+
+  it('should return a AddMenuItemDto instance with null image', () => {
+    const mockFullName = 'my fullname';
+    const mockShortName = 'my shortName';
+    const mockPrice = 8;
+    const mockCategory = CategoryEnum.MAIN;
+    const mockImage = null;
+
+    const menuItem: AddMenuItemDto = new AddMenuItemDto();
+    menuItem.fullName = mockFullName;
+    menuItem.shortName = mockShortName;
+    menuItem.price = mockPrice;
+    menuItem.category = mockCategory;
+    menuItem.image = mockImage;
 
     const addMenuItem = service.createMenuItem(mockFullName, mockShortName, mockPrice, mockCategory);
     expect(addMenuItem).toEqual(menuItem);
@@ -58,12 +78,37 @@ describe('StartupLogicService', () => {
     const mockShortName = 'my shortName';
     const mockPrice = 8;
     const mockCategory = CategoryEnum.MAIN;
+    const mockImage = 'http://example.org/myimage.jpg';
 
     const mockMenuItem = {
       fullName: mockFullName,
       shortName: mockShortName,
       price: mockPrice,
       category: mockCategory,
+      image: mockImage,
+    };
+
+    jest.spyOn(connection.models.MenuItem, 'find').mockResolvedValueOnce([]);
+    jest.spyOn(connection.models.MenuItem, 'create').mockImplementationOnce(() =>
+      Promise.resolve(mockMenuItem),
+    );
+    const newMenuItem = await service.addMenuItem(mockFullName, mockShortName, mockPrice, mockCategory, mockImage);
+    expect(newMenuItem).toEqual(mockMenuItem);
+  });
+
+  it('should add a new menu item with null image', async () => {
+    const mockFullName = 'my fullname';
+    const mockShortName = 'my shortName';
+    const mockPrice = 8;
+    const mockCategory = CategoryEnum.MAIN;
+    const mockImage = null;
+
+    const mockMenuItem = {
+      fullName: mockFullName,
+      shortName: mockShortName,
+      price: mockPrice,
+      category: mockCategory,
+      image: mockImage,
     };
 
     jest.spyOn(connection.models.MenuItem, 'find').mockResolvedValueOnce([]);
@@ -79,18 +124,20 @@ describe('StartupLogicService', () => {
     const mockShortName = 'my shortName';
     const mockPrice = 8;
     const mockCategory = CategoryEnum.MAIN;
+    const mockImage = 'http://example.org/myimage.jpg';
 
     const mockMenuItem = {
       fullName: mockFullName,
       shortName: mockShortName,
       price: mockPrice,
       category: mockCategory,
+      image: mockImage,
     };
 
     jest.spyOn(connection.models.MenuItem, 'find').mockResolvedValueOnce([mockMenuItem]);
 
     const testAddMenuItem = async () => {
-      await service.addMenuItem(mockFullName, mockShortName, mockPrice, mockCategory);
+      await service.addMenuItem(mockFullName, mockShortName, mockPrice, mockCategory, mockImage);
     };
     await expect(testAddMenuItem).rejects.toThrow();
   });

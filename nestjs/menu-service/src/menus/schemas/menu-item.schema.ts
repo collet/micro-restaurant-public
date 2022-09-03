@@ -28,6 +28,10 @@ export class MenuItem {
   @ApiProperty()
   @Prop({ required: true })
   category: CategoryEnum;
+
+  @ApiProperty()
+  @Prop({ default: null })
+  image: string;
 }
 
 export const MenuItemSchema = SchemaFactory.createForClass(MenuItem);

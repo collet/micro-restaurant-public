@@ -9,16 +9,17 @@ import { CategoryEnum } from '../../menus/schemas/category-enum.schema';
 export class StartupLogicService implements OnApplicationBootstrap {
   constructor(@InjectConnection() private connection: Connection) {}
 
-  createMenuItem(fullName: string, shortName: string, price: number, category: CategoryEnum): AddMenuItemDto {
+  createMenuItem(fullName: string, shortName: string, price: number, category: CategoryEnum, image: string = null): AddMenuItemDto {
     const menuItem: AddMenuItemDto = new AddMenuItemDto();
     menuItem.fullName = fullName;
     menuItem.shortName = shortName;
     menuItem.price = price;
     menuItem.category = category;
+    menuItem.image = image;
     return menuItem;
   }
 
-  async addMenuItem(fullName: string, shortName: string, price: number, category: CategoryEnum) {
+  async addMenuItem(fullName: string, shortName: string, price: number, category: CategoryEnum, image: string = null) {
     const menuItemModel = this.connection.models['MenuItem'];
 
     const alreadyExists = await menuItemModel.find({ shortName });
@@ -26,7 +27,7 @@ export class StartupLogicService implements OnApplicationBootstrap {
       throw new Error('Menu Item already exists.');
     }
 
-    return menuItemModel.create(this.createMenuItem(fullName, shortName, price, category));
+    return menuItemModel.create(this.createMenuItem(fullName, shortName, price, category, image));
   }
 
   async onApplicationBootstrap() {
@@ -55,11 +56,11 @@ export class StartupLogicService implements OnApplicationBootstrap {
     } catch (e) {
     }
     try {
-      await this.addMenuItem('Delicious Pizza Regina','pizza',12, CategoryEnum.MAIN);
+      await this.addMenuItem('Delicious Pizza Regina','pizza',12, CategoryEnum.MAIN, 'https://cdn.pixabay.com/photo/2020/02/27/20/13/cake-4885715_1280.jpg');
     } catch (e) {
     }
     try {
-      await this.addMenuItem('Lasagna al forno','lasagna',18, CategoryEnum.MAIN);
+      await this.addMenuItem('Lasagna al forno','lasagna',18, CategoryEnum.MAIN, 'https://cdn.pixabay.com/photo/2017/02/15/15/17/meal-2069021_1280.jpg');
     } catch (e) {
     }
     try {
@@ -75,7 +76,7 @@ export class StartupLogicService implements OnApplicationBootstrap {
     } catch (e) {
     }
     try {
-      await this.addMenuItem('Brownie (home made)','brownie',6.5, CategoryEnum.DESSERT);
+      await this.addMenuItem('Brownie (home made)','brownie',6.5, CategoryEnum.DESSERT, 'https://cdn.pixabay.com/photo/2014/11/28/08/03/brownie-548591_1280.jpg');
     } catch (e) {
     }
     try {
@@ -103,7 +104,7 @@ export class StartupLogicService implements OnApplicationBootstrap {
     } catch (e) {
     }
     try {
-      await this.addMenuItem('Bottled coke (33cl)','coke',3.5, CategoryEnum.BEVERAGE);
+      await this.addMenuItem('Bottled coke (33cl)','coke',3.5, CategoryEnum.BEVERAGE, 'https://cdn.pixabay.com/photo/2019/11/14/15/47/coke-4626458_1280.jpg');
     } catch (e) {
     }
     try {
