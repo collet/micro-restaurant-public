@@ -1,4 +1,6 @@
-import { IsNotEmpty, IsPositive, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsPositive, IsString } from 'class-validator';
+
+import { CategoryEnum } from '../schemas/category-enum.schema';
 
 export class AddMenuItemDto {
   @IsNotEmpty()
@@ -12,4 +14,8 @@ export class AddMenuItemDto {
   @IsNotEmpty()
   @IsPositive()
   price: number;
+
+  @IsNotEmpty()
+  @IsEnum(CategoryEnum)
+  category: CategoryEnum;
 }

@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 
 import { MenusService } from './menus.service';
 import { MenuItem } from '../schemas/menu-item.schema';
+import { CategoryEnum } from '../schemas/category-enum.schema';
 
 import { AddMenuItemDto } from '../dto/add-menu-item.dto';
 
@@ -18,12 +19,14 @@ describe('MenusService', () => {
     fullName: 'Delicious Pizza Regina',
     shortName: 'pizza',
     price: 12,
+    category: CategoryEnum.MAIN,
   };
 
   const mockMenuItem = {
     fullName: 'Delicious Pizza Regina',
     shortName: 'pizza',
     price: 12,
+    category: CategoryEnum.MAIN,
   };
 
   const mockMenuItemList = [
@@ -31,16 +34,19 @@ describe('MenusService', () => {
       fullName: 'MenuItem #1',
       shortName: 'MI1',
       price: 1,
+      category: CategoryEnum.STARTER,
     },
     {
       fullName: 'MenuItem #2',
       shortName: 'MI2',
       price: 2,
+      category: CategoryEnum.DESSERT,
     },
     {
       fullName: 'MenuItem #3',
       shortName: 'MI3',
       price: 3,
+      category: CategoryEnum.BEVERAGE,
     },
   ];
 

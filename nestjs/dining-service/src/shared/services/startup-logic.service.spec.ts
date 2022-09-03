@@ -80,6 +80,6 @@ describe('StartupLogicService', () => {
     service.addTable = jest.fn();
     await service.onApplicationBootstrap();
 
-    expect(service.addTable).toHaveBeenCalledTimes(3);
+    expect(service.addTable).toHaveBeenCalledTimes(15);
   });
 });

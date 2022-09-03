@@ -5,6 +5,7 @@ import { MenusService } from '../services/menus.service';
 
 import { AddMenuItemDto } from '../dto/add-menu-item.dto';
 import { GetMenuItemParams } from '../params/get-menu-item.params';
+import { CategoryEnum } from '../schemas/category-enum.schema';
 
 describe('MenusController', () => {
   let controller: MenusController;
@@ -14,6 +15,7 @@ describe('MenusController', () => {
     fullName: 'Delicious Pizza Regina',
     shortName: 'pizza',
     price: 12,
+    category: CategoryEnum.MAIN,
   };
 
   const mockMenuItemList = [
@@ -21,16 +23,19 @@ describe('MenusController', () => {
       fullName: 'MenuItem #1',
       shortName: 'MI1',
       price: 1,
+      category: CategoryEnum.STARTER,
     },
     {
       fullName: 'MenuItem #2',
       shortName: 'MI2',
       price: 2,
+      category: CategoryEnum.DESSERT,
     },
     {
       fullName: 'MenuItem #3',
       shortName: 'MI3',
       price: 3,
+      category: CategoryEnum.BEVERAGE,
     },
   ];
 
@@ -38,6 +43,7 @@ describe('MenusController', () => {
     fullName: 'Delicious Pizza Regina',
     shortName: 'pizza',
     price: 12,
+    category: CategoryEnum.MAIN,
     _id: 'pizza id',
   };
 

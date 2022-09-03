@@ -27,8 +27,62 @@ export class StartupLogicService implements OnApplicationBootstrap {
   async onApplicationBootstrap() {
     try {
       await this.addTable(1);
+    } catch (e) {
+    }
+    try {
       await this.addTable(2);
+    } catch (e) {
+    }
+    try {
       await this.addTable(3);
+    } catch (e) {
+    }
+    try {
+      await this.addTable(4);
+    } catch (e) {
+    }
+    try {
+      await this.addTable(5);
+    } catch (e) {
+    }
+    try {
+      await this.addTable(6);
+    } catch (e) {
+    }
+    try {
+      await this.addTable(7);
+    } catch (e) {
+    }
+    try {
+      await this.addTable(8);
+    } catch (e) {
+    }
+    try {
+      await this.addTable(9);
+    } catch (e) {
+    }
+    try {
+      await this.addTable(10);
+    } catch (e) {
+    }
+    try {
+      await this.addTable(11);
+    } catch (e) {
+    }
+    try {
+      await this.addTable(12);
+    } catch (e) {
+    }
+    try {
+      await this.addTable(13);
+    } catch (e) {
+    }
+    try {
+      await this.addTable(14);
+    } catch (e) {
+    }
+    try {
+      await this.addTable(15);
     } catch (e) {
     }
   }
