@@ -76,9 +76,11 @@ export class TableOrdersService {
     orderingLine.item = orderingItem;
     orderingLine.howMany = addMenuItemDto.howMany;
 
-    tableOrder.lines.push(orderingLine);
-
-    return this.tableOrderModel.findByIdAndUpdate(tableOrder._id, tableOrder, { returnDocument: 'after' });
+    return this.tableOrderModel.findByIdAndUpdate(
+      tableOrder._id,
+      { $push: { lines: orderingLine } },
+      { returnDocument: 'after' },
+    );
   }
 
   async manageOrderingLine(orderingLine: OrderingLine): Promise<OrderingLineWithCookedItems> {
