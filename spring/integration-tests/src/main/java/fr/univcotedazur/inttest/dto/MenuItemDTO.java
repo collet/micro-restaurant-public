@@ -1,5 +1,6 @@
 package fr.univcotedazur.inttest.dto;
 
+import java.net.URL;
 import java.util.UUID;
 
 public class MenuItemDTO {
@@ -11,6 +12,10 @@ public class MenuItemDTO {
         private String shortName;
 
         private double price;
+
+        private String category; // read the Category as a String (like in dining service)
+
+        private URL image;
 
         public UUID getId() {
                 return id;
@@ -43,4 +48,21 @@ public class MenuItemDTO {
         public void setPrice(double price) {
                 this.price = price;
         }
+
+        public String getCategory() {
+                return category;
+        }
+
+        public void setCategory(String category) {
+                this.category = category;
+        }
+
+        public URL getImage() {
+                return image;
+        }
+
+        public void setImage(URL image) {
+                this.image = image;
+        }
+
 }

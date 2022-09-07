@@ -2,6 +2,8 @@ package fr.univcotedazur.inttest;
 
 import fr.univcotedazur.inttest.dto.CookedItemDTO;
 import fr.univcotedazur.inttest.dto.MenuItemDTO;
+import ij.IJ;
+import ij.ImagePlus;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
@@ -31,7 +33,7 @@ class IntegrationTest {
     final static String TABLES = "/tables";
     final static String ORDERS = "/tableOrders";
     final static String KITCHEN = "/cookedItems";
-    Map<String,UUID> menuItemDTOMap;
+    Map<String,MenuItemDTO> menuItemDTOMap;
 
     @Value("${menu.route:}")
     private String menuRoute;
@@ -63,20 +65,19 @@ class IntegrationTest {
                         .extract().jsonPath().getList("",MenuItemDTO.class);
         menuItemDTOMap = new HashMap<>();
         for (MenuItemDTO m : menuItemDTOList) {
-            menuItemDTOMap.put(m.getShortName(),m.getId());
+            menuItemDTOMap.put(m.getShortName(),m);
         }
     }
 
     @Test
-    public void fullMenuTest() {
-        given()
-                .spec(menusSpec).
-            when().
-                get().
-                then()
-                .statusCode(HttpStatus.SC_OK)
-                .assertThat()
-                .body("size()", is(3));
+    public void fullMenuTest() throws Exception {
+        assertThat("4 items are in the menu", menuItemDTOMap.size() == 4);
+        MenuItemDTO lasagna = menuItemDTOMap.get("lasagna");
+        assertThat("lasagna is the menu", lasagna != null);
+        assertThat("lasagna has the right price", lasagna.getPrice() == 16d);
+        assertThat("lasagna is in the right category", lasagna.getCategory().equals("MAIN"));
+        ImagePlus lasagnaImage = IJ.openImage(lasagna.getImage().toString());
+        assertThat("lasagna image can be retrieved", lasagnaImage.getWidth() == 1280);
     }
 
     @Test
@@ -130,7 +131,7 @@ class IntegrationTest {
                 .body("tableOrderId",equalTo(orderId.toString()));
         JSONObject ordering2pizzas = new JSONObject();
         ordering2pizzas.put("shortName","pizza");
-        ordering2pizzas.put("id", menuItemDTOMap.get("pizza").toString());
+        ordering2pizzas.put("id", menuItemDTOMap.get("pizza").getId().toString());
         ordering2pizzas.put("howMany", "2");
         given()
                 .spec(diningSpec)
@@ -150,7 +151,7 @@ class IntegrationTest {
                 .body("taken", is(true));
         JSONObject ordering3cokes = new JSONObject();
         ordering3cokes.put("shortName","coke");
-        ordering3cokes.put("id", menuItemDTOMap.get("coke").toString());
+        ordering3cokes.put("id", menuItemDTOMap.get("coke").getId().toString());
         ordering3cokes.put("howMany", "3");
         given()
                 .spec(diningSpec)
