@@ -2,7 +2,7 @@ package fr.univcotedazur.dining.controllers;
 
 import fr.univcotedazur.dining.components.KitchenProxy;
 import fr.univcotedazur.dining.components.MenuProxy;
-import fr.univcotedazur.dining.components.dto.ItemsToBeCookedInKitchen;
+import fr.univcotedazur.dining.models.Preparation;
 import fr.univcotedazur.dining.controllers.dto.ItemDTO;
 import fr.univcotedazur.dining.controllers.dto.StartOrderingDTO;
 import fr.univcotedazur.dining.controllers.dto.TableCreationDTO;
@@ -18,7 +18,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -41,7 +40,6 @@ import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.when;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.mockito.ArgumentMatchers.any;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -125,12 +123,19 @@ public class DiningControllerTest {
                 thenReturn(Optional.of(mockLasagna));
         CookedItem fakeCookedItem = new CookedItem();
         fakeCookedItem.setId(UUID.randomUUID());
-        fakeCookedItem.setReadyToServe(LocalDateTime.now());
+        Preparation firstPreparation = new Preparation();
+        firstPreparation.setPreparedItems(List.of(fakeCookedItem,fakeCookedItem));
+        firstPreparation.setShouldBeReadyAt(LocalDateTime.now());
+        Preparation secondPreparation = new Preparation();
+        secondPreparation.setPreparedItems(List.of(fakeCookedItem,fakeCookedItem,fakeCookedItem));
+        secondPreparation.setShouldBeReadyAt(LocalDateTime.now());
+        Preparation thirdPreparation = new Preparation();
+        thirdPreparation.setPreparedItems(List.of(fakeCookedItem));
+        thirdPreparation.setShouldBeReadyAt(LocalDateTime.now());
         org.mockito.Mockito.when(mockedKitchenProxy.sendCookingOrderToKitchen(
-                org.mockito.Mockito.any(ItemsToBeCookedInKitchen.class))).
-                thenReturn(List.of(fakeCookedItem,fakeCookedItem)).
-                thenReturn(List.of(fakeCookedItem,fakeCookedItem,fakeCookedItem)).
-                thenReturn(List.of(fakeCookedItem));
+                org.mockito.Mockito.anyList(), org.mockito.Mockito.anyLong())).
+                thenReturn(List.of(firstPreparation, secondPreparation)).
+                thenReturn(List.of(thirdPreparation));
     }
 
 
@@ -214,35 +219,35 @@ public class DiningControllerTest {
         for (OrderingLine line : lines) {
             assertThat(line.isSentForPreparation(),is(false));
         }
-        List<CookedItem> cookedItems =
+        List<Preparation> preparations =
         when()
                 .post(BASE_URI + "/" + orderId + "/prepare").
                 then()
                 .statusCode(HttpStatus.SC_CREATED)
-                .extract().response().jsonPath().getList("",CookedItem.class);
-        assertThat(cookedItems.size(),equalTo(5));
+                .extract().response().jsonPath().getList("",Preparation.class);
+        assertThat(preparations.size(),equalTo(2));
+        assertThat(preparations.stream().flatMap(prep -> prep.getPreparedItems().stream()).toList().size(),equalTo(5));
         lines =
                 when()
                         .get(BASE_URI + "/" + orderId).
                         then()
                         .statusCode(HttpStatus.SC_OK)
                         .extract().response().jsonPath().getList("lines", OrderingLine.class);
-        for (OrderingLine line : lines) {
-            assertThat(line.isSentForPreparation(),is(true));
-        }
+        assertThat(lines.stream().allMatch(line -> line.isSentForPreparation()), equalTo(true));
         given()
                 .contentType(ContentType.JSON).body(oneLasagna).
                 when()
                 .post(BASE_URI + "/" + orderId).
                 then()
                 .statusCode(HttpStatus.SC_CREATED);
-        cookedItems =
+        preparations =
                 when()
                         .post(BASE_URI + "/" + orderId + "/prepare").
                         then()
                         .statusCode(HttpStatus.SC_CREATED)
-                        .extract().response().jsonPath().getList("",CookedItem.class);
-        assertThat(cookedItems.size(),equalTo(1));
+                        .extract().response().jsonPath().getList("",Preparation.class);
+        assertThat(preparations.size(),equalTo(1));
+        assertThat(preparations.stream().flatMap(prep -> prep.getPreparedItems().stream()).toList().size(),equalTo(1));
     }
 
     @Test

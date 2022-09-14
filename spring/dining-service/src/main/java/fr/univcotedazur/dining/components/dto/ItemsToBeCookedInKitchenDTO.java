@@ -1,6 +1,6 @@
 package fr.univcotedazur.dining.components.dto;
 
-public class ItemsToBeCookedInKitchen {
+public class ItemsToBeCookedInKitchenDTO {
 
     private String shortName;
 

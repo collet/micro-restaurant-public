@@ -1,7 +1,6 @@
 package fr.univcotedazur.inttest;
 
-import fr.univcotedazur.inttest.dto.CookedItemDTO;
-import fr.univcotedazur.inttest.dto.MenuItemDTO;
+import fr.univcotedazur.inttest.dto.*;
 import ij.IJ;
 import ij.ImagePlus;
 import io.restassured.builder.RequestSpecBuilder;
@@ -11,13 +10,11 @@ import org.apache.http.HttpStatus;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.NullValueInNestedPathException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
@@ -32,7 +29,8 @@ class IntegrationTest {
     final static String MENUS = "/menus";
     final static String TABLES = "/tables";
     final static String ORDERS = "/tableOrders";
-    final static String KITCHEN = "/cookedItems";
+    final static String KITCHEN = "/preparations";
+    final static String COOKING = "/preparedItems";
     Map<String,MenuItemDTO> menuItemDTOMap;
 
     @Value("${menu.route:}")
@@ -106,6 +104,7 @@ class IntegrationTest {
         JSONObject createTableParams = new JSONObject();
         createTableParams.put("tableId","1");
         createTableParams.put("customersCount", "6");
+        // create an order
         UUID orderId =
         given()
                 .spec(diningSpec)
@@ -160,51 +159,153 @@ class IntegrationTest {
                 .post(ORDERS + "/" + orderId).
                 then()
                 .statusCode(HttpStatus.SC_CREATED);
-        List<CookedItemDTO> cookedItemDTOs =
+        // send order to be prepared in kitchen
+        List<DiningPreparationDTO> diningPreparationDTOS =
                 given()
                 .spec(diningSpec).
                 when()
                 .post(ORDERS + "/" + orderId + "/prepare").
                 then()
                 .statusCode(HttpStatus.SC_CREATED)
-                .extract().jsonPath().getList("",CookedItemDTO.class);
-        assertThat(cookedItemDTOs.size(),equalTo(5));
-        List<CookedItemDTO> underPreparationCookedItemDTOs =
+                .extract().jsonPath().getList("", DiningPreparationDTO.class);
+        assertThat(diningPreparationDTOS.size(),equalTo(2));
+        assertThat(diningPreparationDTOS.get(0).getId(),is(notNullValue()));
+        assertThat(diningPreparationDTOS.get(0).getPreparedItems().size(),greaterThan(0));
+        List<DiningCookedItemDTO> diningCookedItemDTOS = diningPreparationDTOS.stream().flatMap(preparation ->
+                preparation.getPreparedItems().stream()).toList();
+        assertThat(diningCookedItemDTOS.size(),equalTo(5));
+        // checking that dining and kitchen visions on preparation are consistent
+        List<KitchenPreparationDTO> kitchenPreparationDTOS =
         given()
                 .spec(kitchenSpec).
                 when()
                 .get(KITCHEN + "?state=preparationStarted").
                 then()
                 .statusCode(HttpStatus.SC_OK)
-                .extract().jsonPath().getList("",CookedItemDTO.class);
-        assertThat(underPreparationCookedItemDTOs.size(),equalTo(5));
-        List<CookedItemDTO> readyCookedItemDTOs =
-        given()
-                .spec(kitchenSpec).
-                when()
-                .get(KITCHEN + "?state=readyToBeServed").
-                then()
-                .statusCode(HttpStatus.SC_OK)
-                .extract().jsonPath().getList("",CookedItemDTO.class);
-        assertThat(readyCookedItemDTOs.size(),equalTo(0));
-        Thread.sleep(2000);
-        List<CookedItemDTO> servingCookedItemDTOs =
+                .extract().jsonPath().getList("", KitchenPreparationDTO.class);
+        assertThat(kitchenPreparationDTOS.size(),equalTo(2));
+        List<DiningPreparationDTO> prepDifferences = new ArrayList<>(diningPreparationDTOS);
+        prepDifferences.removeIf(diningDTO -> kitchenPreparationDTOS.stream()
+                        .anyMatch(kitchenDTO -> kitchenDTO.getId().equals(diningDTO.getId())));
+        assertThat(prepDifferences.size(),equalTo(0));
+        List<KitchenPreparedItemDTO> kitchenPreparedItemDTOS = kitchenPreparationDTOS.stream().flatMap(preparation ->
+                preparation.getPreparedItems().stream()).toList();
+        assertThat(kitchenPreparedItemDTOS.size(),equalTo(5));
+        List<DiningCookedItemDTO> itemDifferenes = new ArrayList<>(diningCookedItemDTOS);
+        itemDifferenes.removeIf(diningItem -> kitchenPreparedItemDTOS.stream()
+                 .anyMatch(kitchenItem -> kitchenItem.getId().equals(diningItem.getId())));
+        assertThat(itemDifferenes.size(),equalTo(0));
+        // check consistency with cooking post
+        List<KitchenPreparedItemDTO> barPreparedItemDTOS =
+                given()
+                        .spec(kitchenSpec).
+                        when()
+                        .get(COOKING + "?post=BAR").
+                        then()
+                        .statusCode(HttpStatus.SC_OK)
+                        .extract().jsonPath().getList("", KitchenPreparedItemDTO.class);
+        assertThat(barPreparedItemDTOS.size(),equalTo(3));
+        assertThat(barPreparedItemDTOS.get(0).getStartedAt(),is(nullValue()));
+        List<KitchenPreparedItemDTO> hotPreparedItemDTOS =
+                given()
+                        .spec(kitchenSpec).
+                        when()
+                        .get(COOKING + "?post=HOT_DISH").
+                        then()
+                        .statusCode(HttpStatus.SC_OK)
+                        .extract().jsonPath().getList("", KitchenPreparedItemDTO.class);
+        assertThat(hotPreparedItemDTOS.size(),equalTo(2));
+        // start "cooking" in bar
+        for(KitchenPreparedItemDTO kitchenPreparedItemDTO : barPreparedItemDTOS) {
+            given()
+                    .spec(kitchenSpec).
+                    when()
+                    .post(COOKING + "/" + kitchenPreparedItemDTO.getId() + "/start").
+                    then()
+                    .statusCode(HttpStatus.SC_OK);
+        }
+        List<KitchenPreparedItemDTO> emptyBarPreparedItemDTOS =
+                given()
+                        .spec(kitchenSpec).
+                        when()
+                        .get(COOKING + "?post=BAR").
+                        then()
+                        .statusCode(HttpStatus.SC_OK)
+                        .extract().jsonPath().getList("", KitchenPreparedItemDTO.class);
+        assertThat(emptyBarPreparedItemDTOS.size(),equalTo(0));
+        // finish "cooking" at the bar
+        for(KitchenPreparedItemDTO kitchenPreparedItemDTO : barPreparedItemDTOS) {
+            given()
+                    .spec(kitchenSpec).
+                    when()
+                    .post(COOKING + "/" + kitchenPreparedItemDTO.getId() + "/finish").
+                    then()
+                    .statusCode(HttpStatus.SC_OK);
+        }
+        List<KitchenPreparationDTO> readyKitchenPreparationDTOS =
                 given()
                         .spec(kitchenSpec).
                         when()
                         .get(KITCHEN + "?state=readyToBeServed").
                         then()
                         .statusCode(HttpStatus.SC_OK)
-                        .extract().jsonPath().getList("",CookedItemDTO.class);
-        assertThat(servingCookedItemDTOs.size(),equalTo(5));
-        for (CookedItemDTO cookedItemDTO : servingCookedItemDTOs) {
+                        .extract().jsonPath().getList("", KitchenPreparationDTO.class);
+        assertThat(readyKitchenPreparationDTOS.size(),equalTo(1));
+        assertThat(readyKitchenPreparationDTOS.get(0).getPreparedItems().get(0).getShortName(),equalTo("coke"));
+        List<KitchenPreparationDTO> notReadyKitchenPreparationDTOS =
+                given()
+                        .spec(kitchenSpec).
+                        when()
+                        .get(KITCHEN + "?state=preparationStarted").
+                        then()
+                        .statusCode(HttpStatus.SC_OK)
+                        .extract().jsonPath().getList("", KitchenPreparationDTO.class);
+        assertThat(notReadyKitchenPreparationDTOS.size(),equalTo(1));
+        assertThat(notReadyKitchenPreparationDTOS.get(0).getPreparedItems().get(0).getShortName(),equalTo("pizza"));
+        // serve the cokes
+        KitchenPreparationDTO servedCokes =
+                given()
+                        .spec(kitchenSpec).
+                        when()
+                        .post(KITCHEN + "/" + readyKitchenPreparationDTOS.get(0).getId() + "/takenToTable").
+                        then()
+                        .statusCode(HttpStatus.SC_OK)
+                        .extract().as(KitchenPreparationDTO.class);
+        assertThat(servedCokes.getTakenForServiceAt(),is(notNullValue()));
+        // start/finish cooking pizza
+        for(KitchenPreparedItemDTO kitchenPreparedItemDTO : hotPreparedItemDTOS) {
             given()
                     .spec(kitchenSpec).
                     when()
-                    .post(KITCHEN + "/" + cookedItemDTO.getId() + "/takenToTable" ).
+                    .post(COOKING + "/" + kitchenPreparedItemDTO.getId() + "/start").
+                    then()
+                    .statusCode(HttpStatus.SC_OK);
+            given()
+                    .spec(kitchenSpec).
+                    when()
+                    .post(COOKING + "/" + kitchenPreparedItemDTO.getId() + "/finish").
                     then()
                     .statusCode(HttpStatus.SC_OK);
         }
+        // check that pizzas are ready at the table level
+        List<KitchenPreparationDTO> readyPizzaKitchenPreparationDTOS =
+                given()
+                        .spec(kitchenSpec).
+                        when()
+                        .get(KITCHEN + "?state=readyToBeServed"). // ,tableId=1
+                        then()
+                        .statusCode(HttpStatus.SC_OK)
+                        .extract().jsonPath().getList("", KitchenPreparationDTO.class);
+        assertThat(readyPizzaKitchenPreparationDTOS.size(),equalTo(1));
+        assertThat(readyPizzaKitchenPreparationDTOS.get(0).getPreparedItems().get(0).getShortName(),equalTo("pizza"));
+        // take pizzas to the table
+        given()
+                .spec(kitchenSpec).
+                when()
+                .post(KITCHEN + "/" + readyPizzaKitchenPreparationDTOS.get(0).getId() + "/takenToTable").
+                then()
+                .statusCode(HttpStatus.SC_OK);
+        // bill
         given()
                 .spec(diningSpec).
                 when()

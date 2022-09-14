@@ -1,13 +1,14 @@
 package fr.univcotedazur.kitchen.exceptions;
 
-public class WrongQueryParameterException extends Exception {
+public class WrongStateNameForPreparationException extends Exception {
 
-    String badStateNameForQuery;
+    private final String badStateNameForQuery;
 
     public String getBadStateNameForQuery() {
         return badStateNameForQuery;
     }
-    public WrongQueryParameterException(String stateName) {
+
+    public WrongStateNameForPreparationException(String stateName) {
         this.badStateNameForQuery = stateName;
     }
 }

@@ -1,6 +1,6 @@
 package fr.univcotedazur.dining.components;
 
-import fr.univcotedazur.dining.components.dto.ItemsToBeCookedInKitchen;
+import fr.univcotedazur.dining.models.Preparation;
 import fr.univcotedazur.dining.exceptions.TableAlreadyTakenException;
 import fr.univcotedazur.dining.exceptions.TableOrderAlreadyBilledException;
 import fr.univcotedazur.dining.models.*;
@@ -25,7 +25,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 @Testcontainers
@@ -78,9 +78,15 @@ class DiningRoomTest {
         order1 = diningRoom.startOrderingOnTable(table1,3);
         CookedItem fakeCookedItem = new CookedItem();
         fakeCookedItem.setId(UUID.randomUUID());
-        fakeCookedItem.setReadyToServe(LocalDateTime.now());
-        when(mockedKitchenProxy.sendCookingOrderToKitchen(any(ItemsToBeCookedInKitchen.class))).
-                thenReturn(List.of(fakeCookedItem,fakeCookedItem));
+        Preparation firstPreparation = new Preparation();
+        firstPreparation.setShouldBeReadyAt(LocalDateTime.now());
+        firstPreparation.setPreparedItems(List.of(fakeCookedItem,fakeCookedItem));
+        Preparation secondPreparation = new Preparation();
+        secondPreparation.setShouldBeReadyAt(LocalDateTime.now());
+        secondPreparation.setPreparedItems(List.of(fakeCookedItem,fakeCookedItem,fakeCookedItem));
+        when(mockedKitchenProxy.sendCookingOrderToKitchen(anyList(),anyLong())).
+                thenReturn(List.of(firstPreparation,secondPreparation)).
+                thenReturn(List.of(firstPreparation));
     }
 
     @AfterEach void tearDown() {
@@ -121,17 +127,17 @@ class DiningRoomTest {
     @Test
     void sendItemsForPreparation() throws Exception {
         diningRoom.addNewItemOnTableOrder(order1,pizza,2);
-        diningRoom.addNewItemOnTableOrder(order1,coke,2);
+        diningRoom.addNewItemOnTableOrder(order1,coke,3);
         TableOrder foundOrder = diningRoom.currentTableOrderOnTable(table1);
-        int sentCount = diningRoom.sendItemsForPreparation(foundOrder).size();
-        assertThat(sentCount,equalTo(4));
+        List<Preparation> receivedPreparations = diningRoom.sendItemsForPreparation(foundOrder);
+        assertThat(receivedPreparations.size(),equalTo(2));
+        assertThat(receivedPreparations.stream().flatMap(prep -> prep.getPreparedItems().stream()).toList().size(),equalTo(5));
         foundOrder = diningRoom.currentTableOrderOnTable(table1);
-        List<OrderingLine> sentLines = foundOrder.getLines();
-        for (OrderingLine line : sentLines) {
-            assertThat(line.isSentForPreparation(),equalTo(true));
-        }
+        assertThat(foundOrder.getLines().stream().allMatch(line -> line.isSentForPreparation()), equalTo(true));
         TableOrder returnedOrder = diningRoom.addNewItemOnTableOrder(foundOrder,lasagna,2);
-        assertThat(diningRoom.sendItemsForPreparation(returnedOrder).size(),equalTo(2));
+        receivedPreparations = diningRoom.sendItemsForPreparation(returnedOrder);
+        assertThat(receivedPreparations.size(),equalTo(1));
+        assertThat(receivedPreparations.stream().flatMap(prep -> prep.getPreparedItems().stream()).toList().size(),equalTo(2));
     }
 
     @Test

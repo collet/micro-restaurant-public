@@ -1,5 +1,6 @@
 package fr.univcotedazur.kitchen.models;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.data.annotation.Id;
 
 import javax.validation.constraints.NotBlank;
@@ -12,15 +13,22 @@ public class Recipe {
 
         @Id
         @NotBlank
+        @JsonView(Views.Public.class)
         private String shortName; // the short name of the menu item serves here as Id
         // The Id itself is used upward in the process flow between menu and dining.
-        // Here the kitchen handles the name and the recipes and produces CookedItem
+        // Here the kitchen handles the name and the recipes and produces PreparedItem
         // following a type-instance pattern
 
         @NotNull
+        @JsonView(Views.Public.class)
+        private Post post;
+
+        @NotNull
+        @JsonView(Views.Public.class)
         private List<String> cookingSteps;
 
         @NotNull
+        @JsonView(Views.Public.class)
         private int meanCookingTimeInSec; // should be a TemporalAmount
 
         public String getShortName() {
@@ -31,6 +39,14 @@ public class Recipe {
                 this.shortName = shortName;
         }
 
+        public Post getPost() {
+                return post;
+        }
+
+        public void setPost(Post post) {
+                this.post = post;
+        }
+
         public List<String> getCookingSteps() {
                 return cookingSteps;
         }
@@ -38,7 +54,6 @@ public class Recipe {
         public void setCookingSteps(List<String> cookingSteps) {
                 this.cookingSteps = cookingSteps;
         }
-
 
         public int getMeanCookingTimeInSec() {
                 return meanCookingTimeInSec;
@@ -48,8 +63,9 @@ public class Recipe {
                 this.meanCookingTimeInSec = meanCookingTimeInSec;
         }
 
-        public Recipe(String shortName, List<String> cookingSteps, int meanCookingTimeInSec) {
+        public Recipe(String shortName, Post post, List<String> cookingSteps, int meanCookingTimeInSec) {
                 this.shortName = shortName;
+                this.post = post;
                 this.cookingSteps = cookingSteps;
                 this.meanCookingTimeInSec = meanCookingTimeInSec;
         }

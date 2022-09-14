@@ -1,6 +1,4 @@
-package fr.univcotedazur.kitchen.controllers.dto;
-
-import org.springframework.data.annotation.Id;
+package fr.univcotedazur.kitchen.models;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;

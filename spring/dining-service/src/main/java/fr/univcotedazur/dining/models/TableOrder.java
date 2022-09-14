@@ -28,6 +28,8 @@ public class TableOrder {
 
         private List<OrderingLine> lines;
 
+        private List<Preparation> preparations;
+
         private LocalDateTime billed;
 
         public UUID getId() {
@@ -70,6 +72,14 @@ public class TableOrder {
                 this.lines = lines;
         }
 
+        public List<Preparation> getPreparations() {
+                return preparations;
+        }
+
+        public void setPreparations(List<Preparation> preparations) {
+                this.preparations = preparations;
+        }
+
         public LocalDateTime getBilled() {
                 return billed;
         }
@@ -83,11 +93,12 @@ public class TableOrder {
                 if (this == o) return true;
                 if (!(o instanceof TableOrder)) return false;
                 TableOrder that = (TableOrder) o;
-                return customersCount == that.customersCount && Objects.equals(id, that.id) && Objects.equals(tableNumber, that.tableNumber) && Objects.equals(opened, that.opened) && Objects.equals(lines, that.lines) && Objects.equals(billed, that.billed);
+                return customersCount == that.customersCount && id.equals(that.id) && tableNumber.equals(that.tableNumber) && opened.equals(that.opened) && Objects.equals(lines, that.lines) && Objects.equals(preparations, that.preparations) && Objects.equals(billed, that.billed);
         }
 
         @Override
         public int hashCode() {
-                return Objects.hash(id, tableNumber, customersCount, opened, lines, billed);
+                return Objects.hash(id, tableNumber, customersCount, opened, lines, preparations, billed);
         }
+
 }

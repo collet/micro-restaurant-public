@@ -3,10 +3,10 @@ package fr.univcotedazur.dining.controllers;
 import fr.univcotedazur.dining.components.DiningRoom;
 import fr.univcotedazur.dining.components.MenuProxy;
 import fr.univcotedazur.dining.components.TablesLayout;
+import fr.univcotedazur.dining.models.Preparation;
 import fr.univcotedazur.dining.controllers.dto.StartOrderingDTO;
 import fr.univcotedazur.dining.controllers.dto.ItemDTO;
 import fr.univcotedazur.dining.exceptions.*;
-import fr.univcotedazur.dining.models.CookedItem;
 import fr.univcotedazur.dining.models.OrderingItem;
 import fr.univcotedazur.dining.models.Table;
 import fr.univcotedazur.dining.models.TableOrder;
@@ -75,7 +75,7 @@ public class DiningController {
     }
 
     @PostMapping("/{tableOrderId}/prepare")
-    public ResponseEntity<List<CookedItem>> prepare(@PathVariable("tableOrderId") UUID tableOrderId)
+    public ResponseEntity<List<Preparation>> prepare(@PathVariable("tableOrderId") UUID tableOrderId)
             throws TableOrderIdNotFoundException {
         TableOrder tableOrder = diningRoom.retrieveTableOrder(tableOrderId);
         return ResponseEntity.status(HttpStatus.CREATED).body(diningRoom.sendItemsForPreparation(tableOrder));

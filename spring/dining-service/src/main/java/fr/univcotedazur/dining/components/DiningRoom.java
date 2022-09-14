@@ -1,8 +1,8 @@
 package fr.univcotedazur.dining.components;
 
+import fr.univcotedazur.dining.models.Preparation;
 import fr.univcotedazur.dining.controllers.dto.TableWithOrderDTO;
-import fr.univcotedazur.dining.models.CookedItem;
-import fr.univcotedazur.dining.components.dto.ItemsToBeCookedInKitchen;
+import fr.univcotedazur.dining.components.dto.ItemsToBeCookedInKitchenDTO;
 import fr.univcotedazur.dining.exceptions.*;
 import fr.univcotedazur.dining.models.OrderingItem;
 import fr.univcotedazur.dining.models.OrderingLine;
@@ -86,7 +86,7 @@ public class DiningRoom {
             throw new TableOrderAlreadyBilledException(tableOrder.getTableNumber(), tableOrder.getId());
         } else {
             tableOrder.setBilled(LocalDateTime.now());
-            System.err.println("TODO: send payment for the tableOrder" + tableOrder.getId() + " on table " +
+            System.err.println("TO BE IMPLEMENTED: send payment for the tableOrder" + tableOrder.getId() + " on table " +
                     tableOrder.getTableNumber());
             tablesLayout.freeTable(tablesLayout.retrieveTable(tableOrder.getTableNumber()));
             return tableOrderRepository.save(tableOrder);
@@ -111,22 +111,25 @@ public class DiningRoom {
         }
     }
 
-    public List<CookedItem> sendItemsForPreparation(TableOrder tableOrder) {
-        ArrayList<OrderingLine> updatedLines = new ArrayList<>();
-        ArrayList<CookedItem> cookedItemDTOs = new ArrayList<>();
-        for (OrderingLine line : tableOrder.getLines()) {
-            if (!line.isSentForPreparation()) {
-                ItemsToBeCookedInKitchen itemsToBeCookedInKitchen = new ItemsToBeCookedInKitchen();
-                itemsToBeCookedInKitchen.setShortName(line.getItem().getShortName());
-                itemsToBeCookedInKitchen.setHowMany(line.getHowMany());
-                cookedItemDTOs.addAll(kitchenProxy.sendCookingOrderToKitchen(itemsToBeCookedInKitchen));
-                line.setSentForPreparation(true);
-            }
-            updatedLines.add(line);
+    public List<Preparation> sendItemsForPreparation(TableOrder tableOrder) {
+        List<OrderingLine> orderLines = tableOrder.getLines();
+        List<Preparation> ongoingPreparations = kitchenProxy.sendCookingOrderToKitchen(orderLines.stream().
+                filter(line -> !line.isSentForPreparation()).toList(),
+                tableOrder.getTableNumber());
+        tableOrder.setLines(allLinesAsPrepared(orderLines));
+        List<Preparation> previousPreparations = tableOrder.getPreparations();
+        if (previousPreparations == null) {
+            previousPreparations = new ArrayList<>();
         }
-        tableOrder.setLines(updatedLines);
+        previousPreparations.addAll(ongoingPreparations);
+        tableOrder.setPreparations(previousPreparations);
         tableOrderRepository.save(tableOrder);
-        return cookedItemDTOs;
+        return ongoingPreparations;
+    }
+
+    private List<OrderingLine> allLinesAsPrepared(List<OrderingLine> input) {
+        input.forEach(line -> line.setSentForPreparation(true));
+        return input;
     }
 
 }
