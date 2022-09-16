@@ -5,6 +5,7 @@ import { MenusService } from '../services/menus.service';
 
 import { AddMenuItemDto } from '../dto/add-menu-item.dto';
 import { GetMenuItemParams } from '../params/get-menu-item.params';
+import { CategoryEnum } from '../schemas/category-enum.schema';
 
 describe('MenusController', () => {
   let controller: MenusController;
@@ -14,6 +15,8 @@ describe('MenusController', () => {
     fullName: 'Delicious Pizza Regina',
     shortName: 'pizza',
     price: 12,
+    category: CategoryEnum.MAIN,
+    image: 'https://cdn.pixabay.com/photo/2020/02/27/20/13/cake-4885715_1280.jpg',
   };
 
   const mockMenuItemList = [
@@ -21,16 +24,22 @@ describe('MenusController', () => {
       fullName: 'MenuItem #1',
       shortName: 'MI1',
       price: 1,
+      category: CategoryEnum.STARTER,
+      image: 'https://cdn.pixabay.com/photo/2020/02/27/20/13/cake-4885715_1280.jpg',
     },
     {
       fullName: 'MenuItem #2',
       shortName: 'MI2',
       price: 2,
+      category: CategoryEnum.DESSERT,
+      image: null,
     },
     {
       fullName: 'MenuItem #3',
       shortName: 'MI3',
       price: 3,
+      category: CategoryEnum.BEVERAGE,
+      image: null,
     },
   ];
 
@@ -38,6 +47,8 @@ describe('MenusController', () => {
     fullName: 'Delicious Pizza Regina',
     shortName: 'pizza',
     price: 12,
+    category: CategoryEnum.MAIN,
+    image: 'https://cdn.pixabay.com/photo/2020/02/27/20/13/cake-4885715_1280.jpg',
     _id: 'pizza id',
   };
 

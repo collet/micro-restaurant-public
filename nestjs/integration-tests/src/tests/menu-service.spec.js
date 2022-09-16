@@ -22,7 +22,7 @@ describe('Menu Service', () => {
           .expect("status", 200)
           .expect("jsonTypesStrict", "*", MenuItemValidator)
           .then((res) => {
-            expect(res.json.length).toBeGreaterThanOrEqual(3);
+            expect(res.json.length).toBeGreaterThanOrEqual(30);
           });
       });
     });

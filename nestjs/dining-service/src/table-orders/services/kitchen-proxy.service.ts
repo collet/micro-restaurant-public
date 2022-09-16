@@ -23,8 +23,13 @@ export class KitchenProxyService {
 
   async sendItemsToCook(orderingLine: OrderingLine): Promise<CookedItemDto[]> {
     const itemToBeCooked: ItemToBeCookedDto = ItemToBeCookedDto.itemToBeCookedDtoFactory(orderingLine);
-    const sendItemsToCookCallResponse: AxiosResponse<CookedItemDto[]> = await firstValueFrom(this.httpService.post(`${this._baseUrl}${this._cookedItemsPath}`, itemToBeCooked));
+    try {
+      const sendItemsToCookCallResponse: AxiosResponse<CookedItemDto[]> = await firstValueFrom(this.httpService.post(`${this._baseUrl}${this._cookedItemsPath}`, itemToBeCooked));
 
-    return sendItemsToCookCallResponse.data;
+      return sendItemsToCookCallResponse.data;
+    } catch (e) {
+      console.error('Error happened');
+      console.error(e);
+    }
   }
 }
