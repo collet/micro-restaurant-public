@@ -4,7 +4,7 @@ import { Connection } from 'mongoose';
 
 import { StartupLogicService } from './startup-logic.service';
 
-import { Recipe } from '../../cookedItems/schemas/recipe.schema';
+import { Recipe } from '../schemas/recipe.schema';
 
 describe('StartupLogicService', () => {
   let service: StartupLogicService;

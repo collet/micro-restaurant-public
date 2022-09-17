@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
-import { Recipe, RecipeSchema } from './schemas/recipe.schema';
+import { Recipe, RecipeSchema } from '../shared/schemas/recipe.schema';
 import { CookedItem, CookedItemSchema } from './schemas/cooked-item.schema';
 
 import { CookedItemsController } from './controllers/cooked-items.controller';

@@ -2,32 +2,36 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document } from 'mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 
-import { Recipe } from '../../shared/schemas/recipe.schema';
+import { Recipe } from './recipe.schema';
 
-export type CookedItemDocument = CookedItem & Document;
+export type PreparedItemDocument = PreparedItem & Document;
 
 @Schema({
   versionKey: false,
 })
-export class CookedItem {
+export class PreparedItem {
   @ApiProperty()
   _id: string;
 
   @ApiProperty()
+  @Prop({ required: true })
+  shortName: string;
+
+  @ApiProperty()
   @Prop({ required: true, type: mongoose.Schema.Types.ObjectId, ref: 'Recipe' })
-  cookableRecipe: Recipe;
+  recipe: Recipe;
 
   @ApiProperty()
   @Prop({ required: true, default: new Date() })
-  preparationStarted: Date;
-
-  @ApiProperty()
-  @Prop({ required: true, default: new Date() })
-  readyToServe: Date;
+  shouldStartAt: Date;
 
   @ApiProperty()
   @Prop({ default: null })
-  takenForService: Date;
+  startedAt: Date;
+
+  @ApiProperty()
+  @Prop({ default: null })
+  finishedAt: Date;
 }
 
-export const CookedItemSchema = SchemaFactory.createForClass(CookedItem);
+export const PreparedItemSchema = SchemaFactory.createForClass(PreparedItem);

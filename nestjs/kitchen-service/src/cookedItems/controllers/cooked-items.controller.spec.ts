@@ -4,7 +4,7 @@ import { CookedItemsController } from './cooked-items.controller';
 
 import { CookedItemsService } from '../services/cooked-items.service';
 
-import { Recipe } from '../schemas/recipe.schema';
+import { Recipe } from '../../shared/schemas/recipe.schema';
 import { CookStateEnum } from '../schemas/cook-state-enum.schema';
 
 import { ItemToBeCookedDto } from '../dto/item-to-be-cooked.dto';

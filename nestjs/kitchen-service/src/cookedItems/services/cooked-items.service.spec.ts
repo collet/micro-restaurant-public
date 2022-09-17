@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 
 import { CookedItemsService } from './cooked-items.service';
 
-import { Recipe } from '../schemas/recipe.schema';
+import { Recipe } from '../../shared/schemas/recipe.schema';
 import { CookStateEnum } from '../schemas/cook-state-enum.schema';
 import { CookedItem } from '../schemas/cooked-item.schema';
 
