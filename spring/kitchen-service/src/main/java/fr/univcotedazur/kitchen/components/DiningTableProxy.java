@@ -12,27 +12,27 @@ import java.util.stream.Stream;
 public class DiningTableProxy {
 
     @Value("${dining.host.baseurl:}")
-    private String diniongHostandPort;
+    private String diningHostandPort;
 
     private RestTemplate restTemplate = new RestTemplate();
 
     private List<Long> tableIdList;
 
     public List<Long> findAll() {
-        populateMenuItemMapIfNeeded();
+        populateTableIdListIfNeeded();
         return new ArrayList<>(tableIdList);
     }
 
     public boolean isTableIdValid(Long tableId) {
-        populateMenuItemMapIfNeeded();
+        populateTableIdListIfNeeded();
         return tableIdList.contains(tableId);
     }
 
-    private void populateMenuItemMapIfNeeded() {
+    private void populateTableIdListIfNeeded() {
         System.err.println("###################### acessing dining (tables) from the kitchen service #################");
         if (tableIdList == null) {
-            TableDTO[] tables = restTemplate.getForEntity(diniongHostandPort+"/tables", TableDTO[].class).getBody();
-                   tableIdList = Stream.of(tables).map(TableDTO::getNumber).toList();
+            TableDTO[] tables = restTemplate.getForEntity(diningHostandPort +"/tables", TableDTO[].class).getBody();
+            tableIdList = Stream.of(tables).map(TableDTO::getNumber).toList();
         }
     }
 }
