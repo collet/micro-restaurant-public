@@ -13,7 +13,6 @@ export class HealthController {
   private _menuServiceHealthCheckUrl: string;
   private _kitchenServiceHealthCheckUrl: string;
   private _diningServiceHealthCheckUrl: string;
-  private _reactUiWaiterHealthCheckUrl: string;
 
   constructor(
     private configService: ConfigService,
@@ -24,7 +23,6 @@ export class HealthController {
     this._menuServiceHealthCheckUrl = `http://${dependenciesConfig.menu_service_url_with_port}/health`;
     this._kitchenServiceHealthCheckUrl = `http://${dependenciesConfig.kitchen_service_url_with_port}/health`;
     this._diningServiceHealthCheckUrl = `http://${dependenciesConfig.dining_service_url_with_port}/health`;
-    this._reactUiWaiterHealthCheckUrl = `http://${dependenciesConfig.react_ui_waiter_url_with_port}`;
   }
 
   async checkIsHealthy(name, url) {
@@ -42,7 +40,6 @@ export class HealthController {
       async () => this.checkIsHealthy('menu-service', this._menuServiceHealthCheckUrl),
       async () => this.checkIsHealthy('kitchen-service', this._kitchenServiceHealthCheckUrl),
       async () => this.checkIsHealthy('dining-service', this._diningServiceHealthCheckUrl),
-      async () => this.http.pingCheck('react_ui_waiter', this._reactUiWaiterHealthCheckUrl),
     ]);
   }
 }

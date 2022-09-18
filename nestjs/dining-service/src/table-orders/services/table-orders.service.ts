@@ -9,9 +9,9 @@ import { OrderingLine } from '../schemas/ordering-line.schema';
 
 import { StartOrderingDto } from '../dto/start-ordering.dto';
 import { AddMenuItemDto } from '../dto/add-menu-item.dto';
-import { CookedItemDto } from '../dto/cooked-item.dto';
+import { PreparationDto } from '../dto/preparation.dto';
 
-import { OrderingLineWithCookedItems } from '../interfaces/ordering-line-with-cooked-items.interface';
+import { OrderingLinesWithPreparations } from '../interfaces/ordering-lines-with-preparations.interface';
 
 import { TablesService } from '../../tables/services/tables.service';
 import { MenuProxyService } from './menu-proxy.service';
@@ -83,41 +83,40 @@ export class TableOrdersService {
     );
   }
 
-  async manageOrderingLine(orderingLine: OrderingLine): Promise<OrderingLineWithCookedItems> {
-    let cookedItems: CookedItemDto[] = [];
+  async manageOrderingLines(tableNumber: number, orderingLines: OrderingLine[]): Promise<OrderingLinesWithPreparations> {
+    let orderingLinesToSend: OrderingLine[] = [];
 
-    if (!orderingLine.sentForPreparation) {
-      cookedItems = await this.kitchenProxyService.sendItemsToCook(orderingLine);
-      orderingLine.sentForPreparation = true;
-    }
+    const newOrderingLines: OrderingLine[] = orderingLines.map((orderingLine) => {
+      if (!orderingLine.sentForPreparation) {
+        orderingLinesToSend.push(orderingLine);
+        orderingLine.sentForPreparation = true;
+      }
+
+      return orderingLine;
+    });
+
+    const preparations: PreparationDto[] = await this.kitchenProxyService.sendItemsToCook(tableNumber, orderingLinesToSend);
 
     return {
-      orderingLine,
-      cookedItems,
+      orderingLines: newOrderingLines,
+      preparations,
     };
   };
 
-  async sendItemsForPreparation(tableOrderId: string): Promise<CookedItemDto[]> {
+  async sendItemsForPreparation(tableOrderId: string): Promise<PreparationDto[]> {
     const tableOrder: TableOrder = await this.findOne(tableOrderId);
 
     if (tableOrder.billed !== null) {
       throw new TableOrderAlreadyBilledException(tableOrder);
     }
 
-    let newCookedItems: CookedItemDto[] = [];
+    const managedLines: OrderingLinesWithPreparations = await this.manageOrderingLines(tableOrder.tableNumber, tableOrder.lines);
 
-    const managedLinesPromesses: Promise<OrderingLineWithCookedItems>[] = tableOrder.lines.map((orderingLine) => (this.manageOrderingLine(orderingLine)));
-
-    const managedLines: OrderingLineWithCookedItems[] = await Promise.all(managedLinesPromesses);
-
-    tableOrder.lines = managedLines.map((managedLine) => {
-      newCookedItems = newCookedItems.concat(managedLine.cookedItems);
-      return managedLine.orderingLine;
-    });
+    tableOrder.lines = managedLines.orderingLines;
 
     await this.tableOrderModel.findByIdAndUpdate(tableOrder._id, tableOrder, { returnDocument: 'after' });
 
-    return newCookedItems;
+    return managedLines.preparations;
   }
 
   async billOrder(tableOrderId: string): Promise<TableOrder> {

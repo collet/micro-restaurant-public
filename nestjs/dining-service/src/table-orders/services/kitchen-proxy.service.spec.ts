@@ -1,7 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
-import { AxiosResponse } from 'axios';
 import { of } from 'rxjs';
 
 import { DependenciesConfig } from '../../shared/config/interfaces/dependencies-config.interface';
@@ -11,7 +10,7 @@ import { KitchenProxyService } from './kitchen-proxy.service';
 import { OrderingItem } from '../schemas/ordering-item.schema';
 import { OrderingLine } from '../schemas/ordering-line.schema';
 
-import { CookedItemDto } from '../dto/cooked-item.dto';
+import { PreparationDto } from '../dto/preparation.dto';
 
 describe('KitchenProxyService', () => {
   let service: KitchenProxyService;
@@ -22,9 +21,10 @@ describe('KitchenProxyService', () => {
   let mockDependenciesConfig: DependenciesConfig;
 
   let mockOrderingItem: OrderingItem;
-  let mockOrderingLine: OrderingLine;
+  let mockOrderingLines: OrderingLine[];
   let mockRecipeList;
-  let mockCookedItems: Function;
+  let mockTableNumbers: number;
+  let mockPreparations: Function;
   let postSendItemsToCookAxiosResponse: Function;
 
   beforeEach(async () => {
@@ -40,11 +40,18 @@ describe('KitchenProxyService', () => {
       shortName: 'menu item shortname 1',
     };
 
-    mockOrderingLine = {
-      item: mockOrderingItem,
-      howMany: 1,
-      sentForPreparation: false,
-    };
+    mockOrderingLines = [
+      {
+        item: mockOrderingItem,
+        howMany: 1,
+        sentForPreparation: false,
+      },
+      {
+        item: mockOrderingItem,
+        howMany: 2,
+        sentForPreparation: false,
+      }
+    ];
 
     mockRecipeList = [
       {
@@ -67,24 +74,44 @@ describe('KitchenProxyService', () => {
       }
     ];
 
-    mockCookedItems = (readyToServeInPast = false) => ([
+    mockTableNumbers = 1;
+
+    mockPreparations = (shouldBeReadyAtInPast = false) => ([
       {
         _id: 'cooked item id 1',
-        readyToServe: readyToServeInPast
+        shouldBeReadyAt: shouldBeReadyAtInPast
           ? (new Date(now.getTime() - mockRecipeList[0].meanCookingTimeInSec * 1000)).toISOString()
           : (new Date(now.getTime() + mockRecipeList[0].meanCookingTimeInSec * 1000)).toISOString(),
+        preparedItems: [
+          {
+            _id: 'prepared item 1',
+            shortName: 'menu item shortname',
+          }
+        ],
       },
       {
         _id: 'cooked item id 2',
-        readyToServe: readyToServeInPast
+        shouldBeReadyAt: shouldBeReadyAtInPast
           ? (new Date(now.getTime() - mockRecipeList[1].meanCookingTimeInSec * 1000)).toISOString()
           : (new Date(now.getTime() + mockRecipeList[1].meanCookingTimeInSec * 1000)).toISOString(),
+        preparedItems: [
+          {
+            _id: 'prepared item 1',
+            shortName: 'menu item shortname',
+          }
+        ],
       },
       {
         _id: 'cooked item id 3',
-        readyToServe: readyToServeInPast
+        shouldBeReadyAt: shouldBeReadyAtInPast
           ? (new Date(now.getTime() - mockRecipeList[2].meanCookingTimeInSec * 1000)).toISOString()
           : (new Date(now.getTime() + mockRecipeList[2].meanCookingTimeInSec * 1000)).toISOString(),
+        preparedItems: [
+          {
+            _id: 'prepared item 1',
+            shortName: 'menu item shortname',
+          }
+        ],
       }
     ]);
 
@@ -126,12 +153,12 @@ describe('KitchenProxyService', () => {
   });
 
   describe('sendItemsToCook', () => {
-    it('should return the new cookedItems from given orderingLine', async () => {
-      const mockedCookedItemsResult: CookedItemDto[] = mockCookedItems(true);
-      jest.spyOn(httpService, 'post').mockImplementationOnce(() => of(postSendItemsToCookAxiosResponse(mockedCookedItemsResult)));
+    it('should return the new preparations from given orderingLine', async () => {
+      const mockedPreparationsResult: PreparationDto[] = mockPreparations(true);
+      jest.spyOn(httpService, 'post').mockImplementationOnce(() => of(postSendItemsToCookAxiosResponse(mockedPreparationsResult)));
 
-      const cookedItemDtos = await service.sendItemsToCook(mockOrderingLine);
-      expect(cookedItemDtos).toEqual(mockedCookedItemsResult);
+      const preparationDtos = await service.sendItemsToCook(mockTableNumbers, mockOrderingLines);
+      expect(preparationDtos).toEqual(mockedPreparationsResult);
     });
   });
 });

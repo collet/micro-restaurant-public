@@ -5,7 +5,8 @@ import { TableOrdersService } from '../services/table-orders.service';
 
 import { StartOrderingDto } from '../dto/start-ordering.dto';
 import { AddMenuItemDto } from '../dto/add-menu-item.dto';
-import { CookedItemDto } from '../dto/cooked-item.dto';
+import { PreparationDto } from '../dto/preparation.dto';
+import { PreparedItemDto } from '../dto/prepared-item.dto';
 import { GetTableOrderParams } from '../params/get-table-order.params';
 
 import { TableOrder } from '../schemas/table-order.schema';
@@ -24,7 +25,8 @@ describe('TableOrdersController', () => {
   let mockGetTableOrderParams: GetTableOrderParams;
   let startOrderingDto: StartOrderingDto;
   let addMenuItemDto: AddMenuItemDto;
-  let mockCookedItems: CookedItemDto[];
+  let mockPreparedItems: PreparedItemDto[];
+  let mockPreparations: PreparationDto[];
 
   beforeEach(async () => {
     mockTableOrdersList = [
@@ -113,18 +115,36 @@ describe('TableOrdersController', () => {
       howMany: 42,
     };
 
-    mockCookedItems = [
+    mockPreparedItems = [
       {
-        _id: 'cooked item id 1',
-        readyToServe: (new Date()).toISOString(),
+        _id: 'prepared item 1',
+        shortName: 'menu item shortname',
       },
       {
-        _id: 'cooked item id 2',
-        readyToServe: (new Date()).toISOString(),
+        _id: 'prepared item 2',
+        shortName: 'menu item shortname',
       },
       {
-        _id: 'cooked item id 3',
-        readyToServe: (new Date()).toISOString(),
+        _id: 'prepared item 3',
+        shortName: 'menu item shortname',
+      }
+    ];
+
+    mockPreparations = [
+      {
+        _id: 'preparation id 1',
+        shouldBeReadyAt: (new Date()).toISOString(),
+        preparedItems: [mockPreparedItems[0]],
+      },
+      {
+        _id: 'preparation id 2',
+        shouldBeReadyAt: (new Date()).toISOString(),
+        preparedItems: [mockPreparedItems[1]],
+      },
+      {
+        _id: 'preparation id 3',
+        shouldBeReadyAt: (new Date()).toISOString(),
+        preparedItems: [mockPreparedItems[2]],
       }
     ];
 
@@ -191,7 +211,7 @@ describe('TableOrdersController', () => {
     it('should send items for preparation from tableOrder', async () => {
       const createSpy = jest
         .spyOn(service, 'sendItemsForPreparation')
-        .mockResolvedValueOnce(mockCookedItems);
+        .mockResolvedValueOnce(mockPreparations);
 
       await controller.prepareTableOrder(mockGetTableOrderParams);
       expect(createSpy).toHaveBeenCalledWith(mockGetTableOrderParams.tableOrderId);
