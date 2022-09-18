@@ -39,13 +39,6 @@ async function bootstrap() {
       [`^/dining`]: '',
     }
   }));
-  app.use('/waiter', createProxyMiddleware({
-    target: `http://${dependenciesConfig.react_ui_waiter_url_with_port}`,
-    changeOrigin: true,
-    pathRewrite: {
-      [`^/waiter`]: '',
-    }
-  }));
 
   // Run the app
   const appPort = configService.get('app.port');

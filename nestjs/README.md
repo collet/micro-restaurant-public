@@ -14,7 +14,7 @@
 
 ## Features
 
-* Menu management (no type of entry, no image associated)
+* Menu management (with type of entry + image associated)
 * Table management (table numbering)
 * Table order management (start/end order on a table, add items, send them to kitchen, bill)
 * Kitchen management (receiving batches of menu items to be cooked, making them available and tracing when they are taken back to table)
@@ -22,8 +22,6 @@
 **Not yet implemented:**
 
 * Proper logging
-* Static image serving on the menu service
-* Bar separated from kitchen with different serving delays
 * External Bank system
 * Gateway
 
@@ -32,9 +30,10 @@
 * `menu-service` (deployed on `http://localhost:3000/menus` with API doc at `/doc/menus`): implements the content of the menu, which could be used to display it, checks consistency with other services using the menu items.
 * `dining-service` (deployed on `http://localhost:3001/tables and /tableOrders` with API doc at `doc/dining`): implements the dining room context, with table management, and ordering at the table level.
   This service is coupled to menu to get the menu entries, and to kitchen to send the orders to be prepared one the ordering is done.
-* `kitchen-service` (deployed on `http://localhost:3002/kitchen` with API doc at `doc/kitchen`): implements the kitchen context, receiving batches of items to be cooked and served back.
+* `kitchen-service` (deployed on `http://localhost:3002/kitchen` with API doc at `doc/kitchen`): implements the kitchen context, receiving batches of items to be cooked and served back. (_For now, End-to-end and unit tests are missing for this service_)
 
 * `integration-tests`: a specific service that run end to end tests at the API level through frisby after docker-composing the other services.
+* `gateway` sets up a gateway to `http://localhost:9500` with subroutes to the different micro-services
 
 ##  Common implementation stack
 

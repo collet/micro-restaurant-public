@@ -8,7 +8,6 @@ services:
       - 3002:3000
     depends_on:
       - mongo_db_kitchen
-      - ${DINING_SERVICE}
     environment:
       - DINING_SERVICE_URL_WITH_PORT=${DINING_SERVICE}:3000
     networks:
