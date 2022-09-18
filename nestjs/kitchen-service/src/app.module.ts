@@ -13,6 +13,8 @@ import { StartupLogicService } from './shared/services/startup-logic.service';
 
 import { HealthModule } from './health/health.module';
 import { PreparationsModule } from './preparations/preparations.module';
+import { PreparedItemsModule } from './preparedItems/prepared-items.module';
+import { KitchenFacadeModule } from './kitchenFacade/kitchen-facade.module';
 
 
 @Module({
@@ -26,6 +28,8 @@ import { PreparationsModule } from './preparations/preparations.module';
     }),
     HealthModule,
     PreparationsModule,
+    PreparedItemsModule,
+    KitchenFacadeModule,
   ],
   providers: [StartupLogicService],
 })

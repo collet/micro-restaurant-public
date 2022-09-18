@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document } from 'mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 
-import { Recipe } from './recipe.schema';
+import { Recipe } from '../../shared/schemas/recipe.schema';
 
 export type PreparedItemDocument = PreparedItem & Document;
 

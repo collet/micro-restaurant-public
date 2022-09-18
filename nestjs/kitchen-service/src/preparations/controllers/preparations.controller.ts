@@ -2,11 +2,13 @@ import { Body, Controller, Get, HttpCode, Param, Post, Query } from '@nestjs/com
 import {
   ApiBadRequestResponse,
   ApiBody,
-  ApiCreatedResponse, ApiNotFoundResponse,
+  ApiCreatedResponse,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiParam,
   ApiQuery,
-  ApiTags, ApiUnprocessableEntityResponse,
+  ApiTags,
+  ApiUnprocessableEntityResponse,
 } from '@nestjs/swagger';
 
 import { PreparationRequestDto } from '../dto/preparation-request.dto';
@@ -23,8 +25,12 @@ import { TableNumberNotFoundException } from '../exceptions/table-number-not-fou
 import { WrongQueryParameterException } from '../exceptions/wrong-query-parameter.exception';
 import { EmptyItemsToBeCookedSentInKitchenException } from '../exceptions/empty-items-to-be-cooked-sent-in-kitchen.exception';
 import { ItemsToBeCookedNotFoundException } from '../exceptions/items-to-be-cooked-not-found.exception';
+import { RecipeNotFoundException } from '../../kitchenFacade/exceptions/recipe-not-found.exception';
+import { PreparationIdNotFoundException } from '../exceptions/preparation-id-not-found.exception';
+import { PreparationNotReadyInKitchenException } from '../exceptions/preparation-not-ready-in-kitchen.exception';
+import { PreparationAlreadyTakenFromKitchenException } from '../exceptions/preparation-already-taken-from-kitchen.exception';
 
-@ApiTags('preparations')
+@ApiTags('Preparations')
 @Controller('/preparations')
 export class PreparationsController {
   constructor(private readonly preparationsService: PreparationsService) {}
@@ -42,6 +48,7 @@ export class PreparationsController {
   @ApiBody({ type: PreparationRequestDto })
   @ApiCreatedResponse({ type: Preparation, isArray: true, description: 'The new preparations corresponding to items sent to cook.' })
   @ApiNotFoundResponse({ type: TableNumberNotFoundException, description: 'Table number in params is not a valid table number.' })
+  @ApiNotFoundResponse({ type: RecipeNotFoundException, description: 'Recipe not found for menu item.' })
   @ApiUnprocessableEntityResponse({ type: EmptyItemsToBeCookedSentInKitchenException, description: 'Empty item list sent to the kitchen' })
   @ApiUnprocessableEntityResponse({ type: ItemsToBeCookedNotFoundException, description: 'Some item names not found by the kitchen' })
   @Post()
@@ -51,6 +58,7 @@ export class PreparationsController {
 
   @ApiParam({ name: 'preparationId' })
   @ApiOkResponse({ type: Preparation, description: 'The searched preparation.' })
+  @ApiNotFoundResponse({ type: PreparationIdNotFoundException, description: 'Preparation Id not found.' })
   @Get(':preparationId')
   async retrievePreparation(@Param() preparationIdParams: PreparationIdParams): Promise<Preparation> {
     return await this.preparationsService.findPreparationById(preparationIdParams.preparationId);
@@ -58,49 +66,13 @@ export class PreparationsController {
 
   @ApiParam({ name: 'preparationId' })
   @ApiOkResponse({ type: Preparation, description: 'The preparation has been successfully declared as brought to the table.' })
+  @ApiNotFoundResponse({ type: PreparationIdNotFoundException, description: 'Preparation Id not found.' })
+  @ApiUnprocessableEntityResponse({ type: PreparationNotReadyInKitchenException, description: 'Preparation not yet ready in the kitchen' })
+  @ApiUnprocessableEntityResponse({ type: PreparationAlreadyTakenFromKitchenException, description: 'Preparation already taken from the kitchen' })
   @HttpCode(200)
   @Post(':preparationId/takenToTable')
   async preparationIsServed(@Param() preparationIdParams: PreparationIdParams): Promise<Preparation> {
     // declaration by the waiter that the preparation is brought to the table
     return await this.preparationsService.isTakenForService(preparationIdParams.preparationId);
   }
-
-
-
-
-
-  /*
-  @ApiBody({ type: ItemToBeCookedDto })
-  @ApiCreatedResponse({ type: CookedItemDto, isArray: true, description: 'The items have been sent to cook.' })
-  @ApiNotFoundResponse({ type: ItemToBeCookedNotFoundException, description: 'Item to be cooked is not known by the kitchen.' })
-  @Post()
-  async sendItemsToCook(@Body() itemToBeCookedDto: ItemToBeCookedDto): Promise<CookedItemDto[]> {
-    const cookedItems: CookedItem[] = await this.cookedItemsService.cookItems(itemToBeCookedDto);
-
-    return CookedItemDto.cookedItemDTOFactoryList(cookedItems);
-  }
-
-  @ApiQuery({ name: 'state', enum: CookStateEnum })
-  @ApiOkResponse({ type: CookedItemDto, isArray: true, description: 'The items have been sent to cook.' })
-  @ApiBadRequestResponse({ type: WrongQueryParameterException, description: 'State in params is not a valid cook state.' })
-  @Get()
-  async getCookedItemsByCookState(@Query() cookStateQueryParams: CookStateQueryParams): Promise<CookedItemDto[]> {
-    const cookedItems: CookedItem[] = await this.cookedItemsService.findByCookState(cookStateQueryParams.state);
-
-    return CookedItemDto.cookedItemDTOFactoryList(cookedItems);
-  }
-
-  @ApiParam({ name: 'cookedItemId' })
-  @ApiOkResponse({ type: CookedItemDto, description: 'The item has been successfully declared as brought to the table.' })
-  @ApiNotFoundResponse({ type: CookedItemIdNotFoundException, description: 'Cooked Item not found' })
-  @ApiUnprocessableEntityResponse({ type: CookedItemAlreadyTakenFromKitchenException, description: 'CookedItem already taken from the kitchen' })
-  @ApiUnprocessableEntityResponse({ type: CookedItemNotReadyInKitchenYetException, description: 'CookedItem not yet ready in the kitchen' })
-  @HttpCode(200)
-  @Post(':cookedItemId/takenToTable')
-  async itemIsServed(@Param() cookedItemIdParams: CookedItemIdParams): Promise<CookedItemDto> {
-    const cookedItem: CookedItem = await this.cookedItemsService.isTakenForService(cookedItemIdParams.cookedItemId);
-
-    return CookedItemDto.cookedItemDTOFactory(cookedItem);
-  }
-  */
 }

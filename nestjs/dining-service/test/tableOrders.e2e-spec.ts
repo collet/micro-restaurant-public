@@ -15,7 +15,7 @@ import { TableOrdersModule } from '../src/table-orders/table-orders.module';
 import { TablesModule } from '../src/tables/tables.module';
 
 import { TableOrdersService } from '../src/table-orders/services/table-orders.service';
-import { CookedItemDto } from '../src/table-orders/dto/cooked-item.dto';
+import { PreparationDto } from '../src/table-orders/dto/cooked-item.dto';
 
 describe('TableOrdersController (e2e)', () => {
   let app: INestApplication;

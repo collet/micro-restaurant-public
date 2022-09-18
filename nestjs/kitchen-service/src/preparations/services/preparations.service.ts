@@ -9,11 +9,15 @@ import { PreparationStateEnum } from '../schemas/preparation-state-enum.schema';
 import { PreparationRequestDto } from '../dto/preparation-request.dto';
 
 import { DiningProxyService } from './dining-proxy.service';
+import { KitchenFacadeService } from '../../kitchenFacade/services/kitchen-facade.service';
 
 import { WrongQueryParameterException } from '../exceptions/wrong-query-parameter.exception';
 import { TableNumberNotFoundException } from '../exceptions/table-number-not-found.exception';
 import { EmptyItemsToBeCookedSentInKitchenException } from '../exceptions/empty-items-to-be-cooked-sent-in-kitchen.exception';
 import { ItemsToBeCookedNotFoundException } from '../exceptions/items-to-be-cooked-not-found.exception';
+import { PreparationIdNotFoundException } from '../exceptions/preparation-id-not-found.exception';
+import { PreparationNotReadyInKitchenException } from '../exceptions/preparation-not-ready-in-kitchen.exception';
+import { PreparationAlreadyTakenFromKitchenException } from '../exceptions/preparation-already-taken-from-kitchen.exception';
 
 @Injectable()
 export class PreparationsService {
@@ -21,6 +25,7 @@ export class PreparationsService {
     @InjectModel(Recipe.name) private recipeModel: Model<RecipeDocument>,
     @InjectModel(Preparation.name) private preparationModel: Model<PreparationDocument>,
     private readonly diningProxyService: DiningProxyService,
+    private readonly kitchenFacadeService: KitchenFacadeService,
   ){}
 
   async findByStateAndTableNumber(preparationState: PreparationStateEnum, tableNumber: number = null): Promise<Preparation[]> {
@@ -45,7 +50,10 @@ export class PreparationsService {
           };
         }
 
-        return this.preparationModel.find(mongoFilter).lean();
+        return this.preparationModel.find(mongoFilter).populate({
+          path: 'preparedItems',
+          populate: { path: 'recipe' }
+        }).lean();
       }
 
       case PreparationStateEnum.PREPARATION_STARTED: {
@@ -59,7 +67,10 @@ export class PreparationsService {
           };
         }
 
-        return this.preparationModel.find(mongoFilter).lean();
+        return this.preparationModel.find(mongoFilter).populate({
+          path: 'preparedItems',
+          populate: { path: 'recipe' }
+        }).lean();
       }
 
       default:
@@ -96,76 +107,37 @@ export class PreparationsService {
       throw new ItemsToBeCookedNotFoundException(unknownShortNames);
     }
 
-    // TODO: KitchenService (shared) => kitchenService.receivePreparation(preparationRequestDto.tableNumber, preparationRequestDto.itemsToBeCooked)
+    return await this.kitchenFacadeService.receivePreparation(preparationRequestDto.tableNumber, preparationRequestDto.itemsToBeCooked);
   }
 
-  /*
-  async findOne(cookedItemId: string): Promise<CookedItem> {
-    const foundItem = await this.cookedItemModel.findOne({ _id: cookedItemId }).lean();
+  async findPreparationById(preparationId: string): Promise<Preparation> {
+    const foundPreparation = await this.preparationModel.findOne({ _id: preparationId }).populate({
+      path: 'preparedItems',
+      populate: { path: 'recipe' }
+    }).lean();
 
-    if (foundItem === null) {
-      throw new CookedItemIdNotFoundException(cookedItemId);
+    if (foundPreparation === null) {
+      throw new PreparationIdNotFoundException(preparationId);
     }
 
-    return foundItem;
+    return foundPreparation;
   }
 
-  async cookItems(itemToBeCookedDto: ItemToBeCookedDto): Promise<CookedItem[]> {
-    const foundRecipe: Recipe = await this.recipeModel.findOne({ shortName: itemToBeCookedDto.menuItemShortName }).lean();
-
-    if (foundRecipe === null) {
-      throw new ItemToBeCookedNotFoundException(itemToBeCookedDto.menuItemShortName);
+  async isTakenForService(preparationId: string): Promise<Preparation> {
+    const preparation: Preparation = await this.findPreparationById(preparationId);
+    if (preparation.completedAt === null) {
+      throw new PreparationNotReadyInKitchenException(preparation);
     }
 
-    const cookedItemList: CookedItem[] = [];
-
-    for(let i = 0; i < itemToBeCookedDto.howMany; i += 1) {
-      const cookedItemToCreate = new CookedItem();
-      cookedItemToCreate.cookableRecipe = foundRecipe;
-      cookedItemToCreate.preparationStarted = new Date();
-      cookedItemToCreate.readyToServe = new Date(cookedItemToCreate.preparationStarted.getTime() + foundRecipe.meanCookingTimeInSec * 1000);
-
-      const cookedItem: CookedItem = await this.cookedItemModel.create(cookedItemToCreate);
-
-      cookedItemList.push(cookedItem);
+    if (preparation.takenForServiceAt !== null) {
+      throw new PreparationAlreadyTakenFromKitchenException(preparation);
     }
 
-    return cookedItemList;
+    preparation.takenForServiceAt = new Date();
+
+    return this.preparationModel.findByIdAndUpdate(preparation._id, preparation, { returnDocument: 'after' }).populate({
+      path: 'preparedItems',
+      populate: { path: 'recipe' }
+    });
   }
-
-  async findByCookState(cookState: CookStateEnum): Promise<CookedItem[]> {
-    const now: Date = new Date();
-
-    switch (cookState) {
-      case CookStateEnum.READY_TO_BE_SERVED: {
-        return this.cookedItemModel.find({ 'takenForService': { $eq: null }, 'readyToServe': { $lt: now.toISOString() } }).lean();
-      }
-
-      case CookStateEnum.PREPARATION_STARTED: {
-        return this.cookedItemModel.find({ 'takenForService': { $eq: null }, 'readyToServe': { $gte: now.toISOString() } }).lean();
-      }
-
-      default:
-        throw new WrongQueryParameterException(cookState);
-    }
-  }
-
-  async isTakenForService(cookedItemId: string): Promise<CookedItem> {
-    const cookedItem: CookedItem = await this.findOne(cookedItemId);
-
-    if (cookedItem.takenForService !== null) {
-      throw new CookedItemAlreadyTakenFromKitchenException(cookedItem);
-    }
-
-    const now = new Date();
-    const readyToServeDate = new Date(cookedItem.readyToServe);
-    if (readyToServeDate > now) {
-      throw new CookedItemNotReadyInKitchenYetException(cookedItem);
-    }
-
-    cookedItem.takenForService = new Date();
-
-    return this.cookedItemModel.findByIdAndUpdate(cookedItem._id, cookedItem, { returnDocument: 'after' });
-  }
-  */
 }

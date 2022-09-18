@@ -1,6 +1,6 @@
 import { IsMongoId } from 'class-validator';
 
-export class CookedItemIdParams {
+export class PreparedItemIdParams {
   @IsMongoId()
-  cookedItemId: string;
+  preparedItemId: string;
 }
