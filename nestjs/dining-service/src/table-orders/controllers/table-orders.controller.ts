@@ -28,12 +28,14 @@ import { PreparationDto } from '../dto/preparation.dto';
 export class TableOrdersController {
   constructor(private readonly tableOrdersService: TableOrdersService) {}
 
+  // TODO: Missing "preparations" in TableOrder[] response
   @ApiOkResponse({ type: TableOrder, isArray: true })
   @Get()
   async listAllTableOrders(): Promise<TableOrder[]> {
     return this.tableOrdersService.findAll();
   }
 
+  // TODO: Missing "preparations" in TableOrder response
   @ApiBody({ type: StartOrderingDto })
   @ApiCreatedResponse({ type: TableOrder, description: 'The table has been successfully opened.' })
   @ApiNotFoundResponse({ type: TableNumberNotFoundException, description: 'Table not found' })
@@ -43,6 +45,7 @@ export class TableOrdersController {
     return await this.tableOrdersService.startOrdering(startOrderingDto);
   }
 
+  // TODO: Missing "preparations" in TableOrder response
   @ApiParam({ name: 'tableOrderId' })
   @ApiOkResponse({ type: TableOrder })
   @ApiNotFoundResponse({ type: TableOrderIdNotFoundException, description: 'Table order not found' })
@@ -51,6 +54,7 @@ export class TableOrdersController {
     return this.tableOrdersService.findOne(getTableOrderParams.tableOrderId);
   }
 
+  // TODO: Missing "preparations" in TableOrder response
   @ApiParam({ name: 'tableOrderId' })
   @ApiBody({ type: AddMenuItemDto })
   @ApiCreatedResponse({ type: TableOrder, description: 'The menu item has been successfully added to the table order.' })
@@ -71,6 +75,7 @@ export class TableOrdersController {
     return this.tableOrdersService.sendItemsForPreparation(getTableOrderParams.tableOrderId);
   }
 
+  // TODO: Missing "preparations" in TableOrder response
   @ApiParam({ name: 'tableOrderId' })
   @ApiOkResponse({ type: TableOrder, description: 'The table has been successfully billed.' })
   @ApiNotFoundResponse({ type: TableOrderIdNotFoundException, description: 'Table order not found' })

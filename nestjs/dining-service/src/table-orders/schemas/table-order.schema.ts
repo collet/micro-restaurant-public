@@ -4,6 +4,8 @@ import { ApiProperty } from '@nestjs/swagger';
 
 import { OrderingLine } from './ordering-line.schema';
 
+import { PreparationDto } from '../dto/preparation.dto';
+
 export type TableOrderDocument = TableOrder & Document;
 
 @Schema({
@@ -28,6 +30,10 @@ export class TableOrder {
   @ApiProperty()
   @Prop({ default: [] })
   lines: OrderingLine[];
+
+  @ApiProperty()
+  @Prop({ default: null })
+  preparations: PreparationDto[];
 
   @ApiProperty()
   @Prop({ default: null })

@@ -1,12 +1,11 @@
-import { Body, Controller, Get, HttpCode, Param, Post, Query } from '@nestjs/common';
+import { Controller, Get, HttpCode, Param, Post, Query } from '@nestjs/common';
 import {
-  ApiBadRequestResponse,
-  ApiBody,
-  ApiCreatedResponse, ApiNotFoundResponse,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiParam,
   ApiQuery,
-  ApiTags, ApiUnprocessableEntityResponse,
+  ApiTags,
+  ApiUnprocessableEntityResponse,
 } from '@nestjs/swagger';
 
 import { PreparedItem } from '../schemas/prepared-item.schema';
@@ -63,6 +62,7 @@ export class PreparedItemsController {
     return await this.preparedItemsService.startCookingItem(preparedItemIdParams.preparedItemId);
   }
 
+  // TODO: Remove "recipe" from PreparedItem response
   @ApiParam({ name: 'preparedItemId' })
   @ApiOkResponse({ type: PreparedItem, description: 'The finished prepared item.' })
   @ApiNotFoundResponse({ type: PreparedItemIdNotFoundException, description: 'Prepared Item Id not found.' })

@@ -41,7 +41,7 @@ export class MenusController {
   @Post()
   @ApiCreatedResponse({ description: 'The menu item has been successfully added.', type: MenuItem })
   @ApiConflictResponse({ type: MenuItemShortNameAlreadyExistsException, description: 'Menu short name already exists' })
-  async addMenuItem(@Body() addMenuItemDto: AddMenuItemDto) {
+  async addMenuItem(@Body() addMenuItemDto: AddMenuItemDto): Promise<MenuItem> {
     return await this.menusService.create(addMenuItemDto);
   }
 }

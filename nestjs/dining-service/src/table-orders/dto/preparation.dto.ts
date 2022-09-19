@@ -1,7 +1,6 @@
 import { ArrayNotEmpty, IsArray, IsDateString, IsMongoId, IsNotEmpty } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { PreparedItemDto } from './prepared-item.dto';
-import { OrderingLine } from '../schemas/ordering-line.schema';
 
 export class PreparationDto {
   @ApiProperty()

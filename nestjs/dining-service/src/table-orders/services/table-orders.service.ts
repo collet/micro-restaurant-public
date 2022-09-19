@@ -113,6 +113,7 @@ export class TableOrdersService {
     const managedLines: OrderingLinesWithPreparations = await this.manageOrderingLines(tableOrder.tableNumber, tableOrder.lines);
 
     tableOrder.lines = managedLines.orderingLines;
+    tableOrder.preparations = tableOrder.preparations.concat(managedLines.preparations);
 
     await this.tableOrderModel.findByIdAndUpdate(tableOrder._id, tableOrder, { returnDocument: 'after' });
 

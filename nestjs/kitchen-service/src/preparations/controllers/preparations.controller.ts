@@ -35,6 +35,7 @@ import { PreparationAlreadyTakenFromKitchenException } from '../exceptions/prepa
 export class PreparationsController {
   constructor(private readonly preparationsService: PreparationsService) {}
 
+  // TODO: Remove "recipe" from PreparedItems in Preparation[] response
   @ApiQuery({ name: 'state', enum: PreparationStateEnum })
   @ApiQuery({ name: 'tableNumber', required: false })
   @ApiOkResponse({ type: Preparation, isArray: true, description: 'The preparations filtered by state and/or table number.' })
@@ -45,6 +46,7 @@ export class PreparationsController {
     return await this.preparationsService.findByStateAndTableNumber(stateTableNumberQueryParams.state, stateTableNumberQueryParams.tableNumber);
   }
 
+  // TODO: Remove "recipe" from PreparedItems in Preparation[] response
   @ApiBody({ type: PreparationRequestDto })
   @ApiCreatedResponse({ type: Preparation, isArray: true, description: 'The new preparations corresponding to items sent to cook.' })
   @ApiNotFoundResponse({ type: TableNumberNotFoundException, description: 'Table number in params is not a valid table number.' })
@@ -56,6 +58,7 @@ export class PreparationsController {
     return await this.preparationsService.cookItems(preparationRequestDto);
   }
 
+  // TODO: Remove "recipe" from PreparedItems in Preparation[] response
   @ApiParam({ name: 'preparationId' })
   @ApiOkResponse({ type: Preparation, description: 'The searched preparation.' })
   @ApiNotFoundResponse({ type: PreparationIdNotFoundException, description: 'Preparation Id not found.' })
@@ -64,6 +67,7 @@ export class PreparationsController {
     return await this.preparationsService.findPreparationById(preparationIdParams.preparationId);
   }
 
+  // TODO: Remove "recipe" from PreparedItems in Preparation[] response
   @ApiParam({ name: 'preparationId' })
   @ApiOkResponse({ type: Preparation, description: 'The preparation has been successfully declared as brought to the table.' })
   @ApiNotFoundResponse({ type: PreparationIdNotFoundException, description: 'Preparation Id not found.' })
