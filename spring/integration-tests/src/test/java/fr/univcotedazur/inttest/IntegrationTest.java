@@ -69,13 +69,13 @@ class IntegrationTest {
 
     @Test
     public void fullMenuTest() throws Exception {
-        assertThat("4 items are in the menu", menuItemDTOMap.size() == 4);
+        assertThat("30 items are in the menu", menuItemDTOMap.size() ,equalTo(30));
         MenuItemDTO lasagna = menuItemDTOMap.get("lasagna");
         assertThat("lasagna is the menu", lasagna != null);
-        assertThat("lasagna has the right price", lasagna.getPrice() == 16d);
+        assertThat("lasagna has the right price", lasagna.getPrice(), equalTo(16d));
         assertThat("lasagna is in the right category", lasagna.getCategory().equals("MAIN"));
         ImagePlus lasagnaImage = IJ.openImage(lasagna.getImage().toString());
-        assertThat("lasagna image can be retrieved", lasagnaImage.getWidth() == 1280);
+        assertThat("lasagna image can be retrieved", lasagnaImage.getWidth(), equalTo(1280));
     }
 
     @Test
