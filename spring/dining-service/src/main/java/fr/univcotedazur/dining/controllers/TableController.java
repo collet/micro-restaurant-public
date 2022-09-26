@@ -18,6 +18,7 @@ import java.util.List;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
+@CrossOrigin
 @RequestMapping(path = fr.univcotedazur.dining.controllers.TableController.BASE_URI, produces = APPLICATION_JSON_VALUE)
 public class TableController {
 
