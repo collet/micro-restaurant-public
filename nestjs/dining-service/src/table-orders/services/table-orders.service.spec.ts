@@ -54,6 +54,7 @@ describe('TableOrdersService', () => {
         customersCount: 1,
         opened: null,
         lines: [],
+        preparations: [],
         billed: null,
       },
       {
@@ -62,6 +63,7 @@ describe('TableOrdersService', () => {
         customersCount: 2,
         opened: null,
         lines: [],
+        preparations: [],
         billed: null,
       },
       {
@@ -70,6 +72,7 @@ describe('TableOrdersService', () => {
         customersCount: 3,
         opened: null,
         lines: [],
+        preparations: [],
         billed: null,
       },
     ];
@@ -80,6 +83,7 @@ describe('TableOrdersService', () => {
       customersCount: 42,
       opened: null,
       lines: [],
+      preparations: [],
       billed: null,
     };
 
@@ -124,10 +128,11 @@ describe('TableOrdersService', () => {
       },
     ];
 
-    buildMockTableOrder = (opened = null, lines = [], billed = null) => ({
+    buildMockTableOrder = (opened = null, lines = [], preparations = [], billed = null) => ({
       ...mockTableOrder,
       opened,
       lines,
+      preparations,
       billed,
     });
 
@@ -305,7 +310,7 @@ describe('TableOrdersService', () => {
   });
 
   describe('addOrderingLineToTableOrder', () => {
-    it('should add items as orderingLine to the tableOrder', async () => {
+    it('should add items as new orderingLine to the tableOrder', async () => {
       const mockOpened = new Date();
       const mockOpenedTableOrder = buildMockTableOrder(mockOpened);
       jest.spyOn(service, 'findOne').mockImplementationOnce(() =>
@@ -314,7 +319,45 @@ describe('TableOrdersService', () => {
       jest.spyOn(menuProxyService, 'findByShortName').mockImplementationOnce(() =>
         Promise.resolve(mockOrderingItemList[0]),
       );
-      const mockOpenedTableOrderWithLines = buildMockTableOrder(mockOpened, mockOrderingLineList);
+      const newOrderingLineList = [mockOrderingLineList[0]];
+      newOrderingLineList[0].howMany = addMenuItemDto.howMany;
+      const mockOpenedTableOrderWithLines = buildMockTableOrder(mockOpened, newOrderingLineList);
+      jest.spyOn(model, 'findByIdAndUpdate').mockResolvedValueOnce(mockOpenedTableOrderWithLines);
+
+      const updatedTableOrder = await service.addOrderingLineToTableOrder(mockOpenedTableOrder._id, addMenuItemDto);
+      expect(updatedTableOrder).toEqual(mockOpenedTableOrderWithLines);
+    });
+
+    it('should add items as new orderingLine to the tableOrder if lines are already sent to preparation', async () => {
+      const mockOpened = new Date();
+      const mockOpenedTableOrder = buildMockTableOrder(mockOpened, mockOrderingLineSentForPrepationList);
+      jest.spyOn(service, 'findOne').mockImplementationOnce(() =>
+        Promise.resolve(mockOpenedTableOrder),
+      );
+      jest.spyOn(menuProxyService, 'findByShortName').mockImplementationOnce(() =>
+        Promise.resolve(mockOrderingItemList[0]),
+      );
+      const newOrderingLineList = [...mockOrderingLineSentForPrepationList, mockOrderingLineList[0]];
+      newOrderingLineList[mockOrderingLineSentForPrepationList.length].howMany = addMenuItemDto.howMany;
+      const mockOpenedTableOrderWithLines = buildMockTableOrder(mockOpened, newOrderingLineList);
+      jest.spyOn(model, 'findByIdAndUpdate').mockResolvedValueOnce(mockOpenedTableOrderWithLines);
+
+      const updatedTableOrder = await service.addOrderingLineToTableOrder(mockOpenedTableOrder._id, addMenuItemDto);
+      expect(updatedTableOrder).toEqual(mockOpenedTableOrderWithLines);
+    });
+
+    it('should add items as updated orderingLine to the tableOrder if tableOrder contains already lines corresponding the to request', async () => {
+      const mockOpened = new Date();
+      const mockOpenedTableOrder = buildMockTableOrder(mockOpened, mockOrderingLineList);
+      jest.spyOn(service, 'findOne').mockImplementationOnce(() =>
+        Promise.resolve(mockOpenedTableOrder),
+      );
+      jest.spyOn(menuProxyService, 'findByShortName').mockImplementationOnce(() =>
+        Promise.resolve(mockOrderingItemList[0]),
+      );
+      const newOrderingLineList = [...mockOrderingLineList];
+      newOrderingLineList[0].howMany += addMenuItemDto.howMany;
+      const mockOpenedTableOrderWithLines = buildMockTableOrder(mockOpened, newOrderingLineList);
       jest.spyOn(model, 'findByIdAndUpdate').mockResolvedValueOnce(mockOpenedTableOrderWithLines);
 
       const updatedTableOrder = await service.addOrderingLineToTableOrder(mockOpenedTableOrder._id, addMenuItemDto);
@@ -356,7 +399,7 @@ describe('TableOrdersService', () => {
     it('should return TableOrderAlreadyBilledException if tableOrder is already billed', async () => {
       const mockOpened = new Date();
       const mockBilled = new Date();
-      const mockBilledTableOrder = buildMockTableOrder(mockOpened, [], mockBilled);
+      const mockBilledTableOrder = buildMockTableOrder(mockOpened, [], [], mockBilled);
       jest.spyOn(service, 'findOne').mockImplementationOnce(() =>
         Promise.resolve(mockBilledTableOrder),
       );
@@ -424,7 +467,7 @@ describe('TableOrdersService', () => {
     it('should return TableOrderAlreadyBilledException if tableOrder is already billed', async () => {
       const mockOpened = new Date();
       const mockBilled = new Date();
-      const mockBilledTableOrder = buildMockTableOrder(mockOpened, [], mockBilled);
+      const mockBilledTableOrder = buildMockTableOrder(mockOpened, [], [], mockBilled);
       jest.spyOn(service, 'findOne').mockImplementationOnce(() =>
         Promise.resolve(mockBilledTableOrder),
       );
@@ -447,7 +490,7 @@ describe('TableOrdersService', () => {
         Promise.resolve(mockTable),
       );
       const mockBilled = new Date();
-      const mockBilledTableOrder = buildMockTableOrder(mockOpened, [], mockBilled);
+      const mockBilledTableOrder = buildMockTableOrder(mockOpened, [], [], mockBilled);
       jest.spyOn(model, 'findByIdAndUpdate').mockResolvedValueOnce(mockBilledTableOrder);
 
       const updatedTableOrder = await service.billOrder(mockOpenedTableOrder._id);
@@ -457,7 +500,7 @@ describe('TableOrdersService', () => {
     it('should return TableOrderAlreadyBilledException if tableOrder is already billed', async () => {
       const mockOpened = new Date();
       const mockBilled = new Date();
-      const mockBilledTableOrder = buildMockTableOrder(mockOpened, [], mockBilled);
+      const mockBilledTableOrder = buildMockTableOrder(mockOpened, [], [], mockBilled);
       jest.spyOn(service, 'findOne').mockImplementationOnce(() =>
         Promise.resolve(mockBilledTableOrder),
       );

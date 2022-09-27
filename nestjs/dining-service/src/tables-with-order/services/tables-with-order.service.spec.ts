@@ -31,6 +31,7 @@ describe('TablesWithOrderService', () => {
       customersCount: 42,
       opened: null,
       lines: [],
+      preparations: [],
       billed: null,
     };
 

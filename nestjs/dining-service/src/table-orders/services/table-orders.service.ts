@@ -72,6 +72,20 @@ export class TableOrdersService {
       throw new AddMenuItemDtoNotFoundException(addMenuItemDto);
     }
 
+    const alreadyOrderedLinesIndexes = [];
+    tableOrder.lines.forEach((line, index) => {
+      if (!line.sentForPreparation && line.item._id === orderingItem._id) {
+        alreadyOrderedLinesIndexes.push(index);
+      }
+    });
+
+    if (alreadyOrderedLinesIndexes.length > 0) {
+      const orderingLineIndex = alreadyOrderedLinesIndexes[0];
+      tableOrder.lines[orderingLineIndex].howMany += addMenuItemDto.howMany;
+
+      return this.tableOrderModel.findByIdAndUpdate(tableOrder._id, tableOrder, { returnDocument: 'after' });
+    }
+
     const orderingLine: OrderingLine = new OrderingLine();
     orderingLine.item = orderingItem;
     orderingLine.howMany = addMenuItemDto.howMany;

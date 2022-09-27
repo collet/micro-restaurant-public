@@ -12,6 +12,7 @@ import {
 } from '@nestjs/swagger';
 
 import { PreparationRequestDto } from '../dto/preparation-request.dto';
+import { PreparationDto } from '../dto/preparation.dto';
 
 import { PreparationStateEnum } from '../schemas/preparation-state-enum.schema';
 import { Preparation } from '../schemas/preparation.schema';
@@ -35,10 +36,9 @@ import { PreparationAlreadyTakenFromKitchenException } from '../exceptions/prepa
 export class PreparationsController {
   constructor(private readonly preparationsService: PreparationsService) {}
 
-  // TODO: Remove "recipe" from PreparedItems in Preparation[] response
   @ApiQuery({ name: 'state', enum: PreparationStateEnum })
   @ApiQuery({ name: 'tableNumber', required: false })
-  @ApiOkResponse({ type: Preparation, isArray: true, description: 'The preparations filtered by state and/or table number.' })
+  @ApiOkResponse({ type: PreparationDto, isArray: true, description: 'The preparations filtered by state and/or table number.' })
   @ApiNotFoundResponse({ type: TableNumberNotFoundException, description: 'Table number in params is not a valid table number.' })
   @ApiBadRequestResponse({ type: WrongQueryParameterException, description: 'State in params is not a valid preparation state.' })
   @Get()
@@ -46,9 +46,8 @@ export class PreparationsController {
     return await this.preparationsService.findByStateAndTableNumber(stateTableNumberQueryParams.state, stateTableNumberQueryParams.tableNumber);
   }
 
-  // TODO: Remove "recipe" from PreparedItems in Preparation[] response
   @ApiBody({ type: PreparationRequestDto })
-  @ApiCreatedResponse({ type: Preparation, isArray: true, description: 'The new preparations corresponding to items sent to cook.' })
+  @ApiCreatedResponse({ type: PreparationDto, isArray: true, description: 'The new preparations corresponding to items sent to cook.' })
   @ApiNotFoundResponse({ type: TableNumberNotFoundException, description: 'Table number in params is not a valid table number.' })
   @ApiNotFoundResponse({ type: RecipeNotFoundException, description: 'Recipe not found for menu item.' })
   @ApiUnprocessableEntityResponse({ type: EmptyItemsToBeCookedSentInKitchenException, description: 'Empty item list sent to the kitchen' })
@@ -58,18 +57,16 @@ export class PreparationsController {
     return await this.preparationsService.cookItems(preparationRequestDto);
   }
 
-  // TODO: Remove "recipe" from PreparedItems in Preparation[] response
   @ApiParam({ name: 'preparationId' })
-  @ApiOkResponse({ type: Preparation, description: 'The searched preparation.' })
+  @ApiOkResponse({ type: PreparationDto, description: 'The searched preparation.' })
   @ApiNotFoundResponse({ type: PreparationIdNotFoundException, description: 'Preparation Id not found.' })
   @Get(':preparationId')
   async retrievePreparation(@Param() preparationIdParams: PreparationIdParams): Promise<Preparation> {
     return await this.preparationsService.findPreparationById(preparationIdParams.preparationId);
   }
 
-  // TODO: Remove "recipe" from PreparedItems in Preparation[] response
   @ApiParam({ name: 'preparationId' })
-  @ApiOkResponse({ type: Preparation, description: 'The preparation has been successfully declared as brought to the table.' })
+  @ApiOkResponse({ type: PreparationDto, description: 'The preparation has been successfully declared as brought to the table.' })
   @ApiNotFoundResponse({ type: PreparationIdNotFoundException, description: 'Preparation Id not found.' })
   @ApiUnprocessableEntityResponse({ type: PreparationNotReadyInKitchenException, description: 'Preparation not yet ready in the kitchen' })
   @ApiUnprocessableEntityResponse({ type: PreparationAlreadyTakenFromKitchenException, description: 'Preparation already taken from the kitchen' })

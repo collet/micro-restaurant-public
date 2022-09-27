@@ -15,18 +15,20 @@ import { TableOrdersModule } from '../src/table-orders/table-orders.module';
 import { TablesModule } from '../src/tables/tables.module';
 
 import { TableOrdersService } from '../src/table-orders/services/table-orders.service';
-import { PreparationDto } from '../src/table-orders/dto/cooked-item.dto';
+import { PreparedItemDto } from '../src/table-orders/dto/prepared-item.dto';
+import { PreparationDto } from '../src/table-orders/dto/preparation.dto';
 
 describe('TableOrdersController (e2e)', () => {
   let app: INestApplication;
 
-  let mockTableOrdersList = [
+  const mockTableOrdersList = [
     {
       _id: 'table order 1',
       tableNumber: 1,
       customersCount: 1,
       opened: null,
       lines: [],
+      preparations: [],
       billed: null,
     },
     {
@@ -35,6 +37,7 @@ describe('TableOrdersController (e2e)', () => {
       customersCount: 2,
       opened: null,
       lines: [],
+      preparations: [],
       billed: null,
     },
     {
@@ -43,6 +46,7 @@ describe('TableOrdersController (e2e)', () => {
       customersCount: 3,
       opened: null,
       lines: [],
+      preparations: [],
       billed: null,
     },
   ];
@@ -53,6 +57,7 @@ describe('TableOrdersController (e2e)', () => {
     customersCount: 42,
     opened: null,
     lines: [],
+    preparations: [],
     billed: null,
   };
 
@@ -97,25 +102,45 @@ describe('TableOrdersController (e2e)', () => {
     },
   ];
 
-  const buildMockTableOrder = (opened = null, lines = [], billed = null) => ({
+  const buildMockTableOrder = (opened = null, lines = [], preparations = [], billed = null) => ({
     ...mockTableOrder,
     opened: opened ? opened.toDateString() : null,
     lines,
+    preparations,
     billed: billed ? billed.toDateString() : null,
   });
 
-  const mockCookedItems = [
+
+  const mockPreparedItems = [
     {
-      _id: 'cooked item id 1',
-      readyToServe: (new Date()).toISOString(),
+      _id: 'prepared item 1',
+      shortName: 'menu item shortname',
     },
     {
-      _id: 'cooked item id 2',
-      readyToServe: (new Date()).toISOString(),
+      _id: 'prepared item 2',
+      shortName: 'menu item shortname',
     },
     {
-      _id: 'cooked item id 3',
-      readyToServe: (new Date()).toISOString(),
+      _id: 'prepared item 3',
+      shortName: 'menu item shortname',
+    }
+  ];
+
+  const mockPreparations = [
+    {
+      _id: 'preparation id 1',
+      shouldBeReadyAt: (new Date()).toISOString(),
+      preparedItems: [mockPreparedItems[0]],
+    },
+    {
+      _id: 'preparation id 2',
+      shouldBeReadyAt: (new Date()).toISOString(),
+      preparedItems: [mockPreparedItems[1]],
+    },
+    {
+      _id: 'preparation id 3',
+      shouldBeReadyAt: (new Date()).toISOString(),
+      preparedItems: [mockPreparedItems[2]],
     }
   ];
 
@@ -124,8 +149,8 @@ describe('TableOrdersController (e2e)', () => {
     findOne: () => mockTableOrdersList[0],
     startOrdering: () => (buildMockTableOrder(new Date())),
     addOrderingLineToTableOrder: () => (buildMockTableOrder(new Date(), mockOrderingLineList)),
-    sendItemsForPreparation: () => (mockCookedItems),
-    billOrder: () => (buildMockTableOrder(new Date(), mockOrderingLineList, new Date())),
+    sendItemsForPreparation: () => (mockPreparations),
+    billOrder: () => (buildMockTableOrder(new Date(), mockOrderingLineList, mockPreparations, new Date())),
   };
 
   beforeAll(async () => {

@@ -52,7 +52,7 @@ export class PreparationsService {
 
         return this.preparationModel.find(mongoFilter).populate({
           path: 'preparedItems',
-          populate: { path: 'recipe' }
+          select: { recipe: 0 },
         }).lean();
       }
 
@@ -69,7 +69,7 @@ export class PreparationsService {
 
         return this.preparationModel.find(mongoFilter).populate({
           path: 'preparedItems',
-          populate: { path: 'recipe' }
+          select: { recipe: 0 },
         }).lean();
       }
 
@@ -113,7 +113,7 @@ export class PreparationsService {
   async findPreparationById(preparationId: string): Promise<Preparation> {
     const foundPreparation = await this.preparationModel.findOne({ _id: preparationId }).populate({
       path: 'preparedItems',
-      populate: { path: 'recipe' }
+      select: { recipe: 0 },
     }).lean();
 
     if (foundPreparation === null) {
@@ -137,7 +137,7 @@ export class PreparationsService {
 
     return this.preparationModel.findByIdAndUpdate(preparation._id, preparation, { returnDocument: 'after' }).populate({
       path: 'preparedItems',
-      populate: { path: 'recipe' }
-    });
+      select: { recipe: 0 },
+    }).exec();
   }
 }

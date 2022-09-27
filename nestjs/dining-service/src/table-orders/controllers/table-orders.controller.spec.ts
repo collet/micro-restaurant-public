@@ -36,6 +36,7 @@ describe('TableOrdersController', () => {
         customersCount: 1,
         opened: null,
         lines: [],
+        preparations: [],
         billed: null,
       },
       {
@@ -44,6 +45,7 @@ describe('TableOrdersController', () => {
         customersCount: 2,
         opened: null,
         lines: [],
+        preparations: [],
         billed: null,
       },
       {
@@ -52,6 +54,7 @@ describe('TableOrdersController', () => {
         customersCount: 3,
         opened: null,
         lines: [],
+        preparations: [],
         billed: null,
       },
     ];
@@ -62,6 +65,7 @@ describe('TableOrdersController', () => {
       customersCount: 42,
       opened: null,
       lines: [],
+      preparations: [],
       billed: null,
     };
 
@@ -93,10 +97,11 @@ describe('TableOrdersController', () => {
       },
     ];
 
-    buildMockTableOrder = (opened = null, lines = [], billed = null) => ({
+    buildMockTableOrder = (opened = null, lines = [], preparations = [], billed = null) => ({
       ...mockTableOrder,
       opened,
       lines,
+      preparations,
       billed,
     });
 
@@ -225,7 +230,7 @@ describe('TableOrdersController', () => {
       const mockBilled = new Date();
       const createSpy = jest
         .spyOn(service, 'billOrder')
-        .mockResolvedValueOnce(buildMockTableOrder(mockOpened, mockOrderingLines, mockBilled));
+        .mockResolvedValueOnce(buildMockTableOrder(mockOpened, mockOrderingLines, mockPreparations, mockBilled));
 
       await controller.billTableOrder(mockGetTableOrderParams);
       expect(createSpy).toHaveBeenCalledWith(mockGetTableOrderParams.tableOrderId);

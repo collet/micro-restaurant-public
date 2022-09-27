@@ -12,11 +12,13 @@ import { PreparedItem } from '../schemas/prepared-item.schema';
 import { Recipe } from '../../shared/schemas/recipe.schema';
 import { PostEnum } from '../../shared/schemas/post-enum.schema';
 
+import { PreparedItemDto } from '../../preparations/dto/prepared-item.dto';
+
 import { PreparedItemIdParams } from '../params/prepared-item-id.params';
+
 import { PostQueryParams } from '../params/post.query-params';
 
 import { PreparedItemsService } from '../services/prepared-items.service';
-
 import { PreparedItemIdNotFoundException } from '../exceptions/prepared-item-id-not-found.exception';
 import { ItemAlreadyStartedToBeCookedException } from '../exceptions/item-already-started-to-be-cooked.exception';
 import { ItemNotStartedToBeCookedException } from '../exceptions/item-not-started-to-be-cooked.exception';
@@ -62,9 +64,8 @@ export class PreparedItemsController {
     return await this.preparedItemsService.startCookingItem(preparedItemIdParams.preparedItemId);
   }
 
-  // TODO: Remove "recipe" from PreparedItem response
   @ApiParam({ name: 'preparedItemId' })
-  @ApiOkResponse({ type: PreparedItem, description: 'The finished prepared item.' })
+  @ApiOkResponse({ type: PreparedItemDto, description: 'The finished prepared item.' })
   @ApiNotFoundResponse({ type: PreparedItemIdNotFoundException, description: 'Prepared Item Id not found.' })
   @ApiUnprocessableEntityResponse({ type: ItemNotStartedToBeCookedException, description: 'Item not started to be cooked inside the kitchen' })
   @ApiUnprocessableEntityResponse({ type: ItemAlreadyFinishedToBeCookedException, description: 'Item already finished of being cooked in the kitchen' })

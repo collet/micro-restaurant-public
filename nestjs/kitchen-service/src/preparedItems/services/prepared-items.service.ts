@@ -19,8 +19,13 @@ export class PreparedItemsService {
     private readonly kitchenFacadeService: KitchenFacadeService,
   ){}
 
-  async findPreparedItemById(preparedItemId: string): Promise<PreparedItem> {
-    const foundPreparedItem = await this.preparedItemModel.findOne({ _id: preparedItemId }).populate('recipe').lean();
+  async findPreparedItemById(preparedItemId: string, withRecipe: boolean = true): Promise<PreparedItem> {
+    let foundPreparedItemRequest = this.preparedItemModel.findOne({ _id: preparedItemId }, { recipe: 0 });
+    if (withRecipe) {
+      foundPreparedItemRequest = this.preparedItemModel.findOne({ _id: preparedItemId }).populate('recipe');
+    }
+
+    const foundPreparedItem = await foundPreparedItemRequest.lean();
 
     if (foundPreparedItem === null) {
       throw new PreparedItemIdNotFoundException(preparedItemId);
@@ -32,7 +37,11 @@ export class PreparedItemsService {
   async getAllItemsToStartCookingNow(post: PostEnum): Promise<PreparedItem[]> {
     const now: Date = new Date();
 
-    const preparedItems: PreparedItem[] = await this.preparedItemModel.find({ 'startedAt': { $eq: null }, 'shouldStartAt': { $lte: now.toISOString() } }).populate('recipe').lean();
+    const preparedItems: PreparedItem[] = await this.preparedItemModel
+      .find({ 'startedAt': { $eq: null }, 'shouldStartAt': { $lte: now.toISOString() } })
+      .sort({ shouldStartAt: 1, _id: 1 })
+      .populate('recipe')
+      .lean();
 
     return preparedItems.filter((preparedItem) => (preparedItem.recipe.post === post));
   }
@@ -50,7 +59,7 @@ export class PreparedItemsService {
   }
 
   async finishCookingItem(preparedItemId: string): Promise<PreparedItem> {
-    const preparedItem = await this.findPreparedItemById(preparedItemId);
+    const preparedItem = await this.findPreparedItemById(preparedItemId, false);
 
     if (preparedItem.startedAt === null) {
       throw new ItemNotStartedToBeCookedException(preparedItem);
@@ -60,9 +69,7 @@ export class PreparedItemsService {
       throw new ItemAlreadyFinishedToBeCookedException(preparedItem);
     }
 
-    preparedItem.finishedAt = new Date();
-
-    const updatedPreparedItem: PreparedItem = await this.preparedItemModel.findByIdAndUpdate(preparedItem._id, preparedItem, { returnDocument: 'after' }).populate('recipe');
+    const updatedPreparedItem: PreparedItem = await this.preparedItemModel.findByIdAndUpdate(preparedItem._id, { finishedAt: new Date() }, { returnDocument: 'after', select: { recipe: 0 } }).lean();
 
     await this.kitchenFacadeService.checkAndUpdatePreparation(updatedPreparedItem);
 

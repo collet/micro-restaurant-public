@@ -126,7 +126,7 @@ export class KitchenFacadeService {
   async checkAndUpdatePreparation(preparedItem: PreparedItem) {
     const preparationsFromPreparedItem: Preparation[] = await this.preparationModel.find({ 'completedAt': { $eq: null }, 'preparedItems': preparedItem._id }).populate({
       path: 'preparedItems',
-      populate: { path: 'recipe' }
+      select: { recipe: 0 },
     }).exec();
 
     if (preparationsFromPreparedItem.length === 0 || preparationsFromPreparedItem.length > 1) {
@@ -136,11 +136,7 @@ export class KitchenFacadeService {
     const preparation: Preparation = preparationsFromPreparedItem[0];
 
     if (preparation.preparedItems.every((preparationPreparedItem) => (preparationPreparedItem.finishedAt !== null))) {
-      preparation.completedAt = new Date(preparedItem.finishedAt);
-      await this.preparationModel.findByIdAndUpdate(preparation._id, preparation, { returnDocument: 'after' }).populate({
-        path: 'preparedItems',
-        populate: { path: 'recipe' }
-      });
+      await this.preparationModel.findByIdAndUpdate(preparation._id, { completedAt: new Date(preparedItem.finishedAt) }, { returnDocument: 'after' });
     }
   }
 }
