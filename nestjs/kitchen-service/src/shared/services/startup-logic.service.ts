@@ -87,7 +87,7 @@ export class StartupLogicService implements OnApplicationBootstrap {
     } catch (e) {
     }
     try {
-      await this.addRecipe('lemon', PostEnum.COLD_DISH, ['Take lemon cream', 'Take limoncello sorbet', 'Put all ina plate'], 12);
+      await this.addRecipe('lemon', PostEnum.COLD_DISH, ['Take lemon cream', 'Take limoncello sorbet', 'Put all in a plate'], 12);
     } catch (e) {
     }
     try {

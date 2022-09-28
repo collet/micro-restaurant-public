@@ -62,7 +62,7 @@ class CookingPostTest {
     void runsASimpleCookingProcess() throws Exception {
         assertThat(cookingPost.allItemsToStartCookingNow(Post.HOT_DISH).size(),equalTo(0));
         LocalDateTime timestamp = LocalDateTime.now().withNano(0);
-        PreparedItem preparedPizza = cookingPost.startCookingProcess("pizza", timestamp.plusSeconds(2));
+        PreparedItem preparedPizza = cookingPost.startCookingProcess("pizza", timestamp.plusSeconds(9));
         assertThat(preparedPizza.getId(), is(notNullValue()));
         assertThat(preparedPizza.getShortName(),equalTo("pizza"));
         assertThat(preparedPizza.getShouldStartAt(),equalTo(timestamp.minusSeconds(1)));
