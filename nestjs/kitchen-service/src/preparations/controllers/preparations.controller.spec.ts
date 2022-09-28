@@ -4,6 +4,9 @@ import { PreparationsController } from './preparations.controller';
 import { PreparationsService } from '../services/preparations.service';
 
 import { StateTableNumberQueryParams } from '../params/state-table-number.query-params';
+import { PreparationIdParams } from '../params/preparation-id.params';
+import { PreparationRequestDto } from '../dto/preparation-request.dto';
+import { ItemToBeCookedDto } from '../dto/item-to-be-cooked.dto';
 
 import { Preparation } from '../schemas/preparation.schema';
 import { PreparedItem } from '../../preparedItems/schemas/prepared-item.schema';
@@ -19,6 +22,9 @@ describe('PreparationsController', () => {
   let mockPreparedItemsList: PreparedItem[];
   let mockPreparationsList: Preparation[];
   let mockStateTableNumberQueryParams: StateTableNumberQueryParams;
+  let mockItemToBeCookedList: ItemToBeCookedDto[];
+  let mockPreparationRequestDto: PreparationRequestDto;
+  let mockPreparationIdParams: PreparationIdParams;
 
   beforeEach(async () => {
     mockedRecipes = [
@@ -148,6 +154,26 @@ describe('PreparationsController', () => {
       tableNumber: 1,
     };
 
+    mockItemToBeCookedList = [
+      {
+        menuItemShortName: 'menu item shortname 1',
+        howMany: 2,
+      },
+      {
+        menuItemShortName: 'menu item shortname 2',
+        howMany: 3,
+      },
+    ];
+
+    mockPreparationRequestDto = {
+      tableNumber: 1,
+      itemsToBeCooked: mockItemToBeCookedList,
+    };
+
+    mockPreparationIdParams = {
+      preparationId: mockPreparationsList[0]._id,
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       controllers: [PreparationsController],
       providers: [
@@ -174,7 +200,40 @@ describe('PreparationsController', () => {
         .mockResolvedValueOnce(mockPreparationsList);
 
       expect(controller.getAllPreparationsByStateAndTableNumber(mockStateTableNumberQueryParams)).resolves.toEqual(mockPreparationsList);
-      expect(service.findByStateAndTableNumber).toHaveBeenCalled();
+      expect(serviceFunctionSpy).toHaveBeenCalled();
+    });
+  });
+
+  describe('requestNewPreparation()', () => {
+    it('should return an array of preparations', async () => {
+      const serviceFunctionSpy = jest
+        .spyOn(service, 'cookItems')
+        .mockResolvedValueOnce(mockPreparationsList);
+
+      expect(controller.requestNewPreparation(mockPreparationRequestDto)).resolves.toEqual(mockPreparationsList);
+      expect(serviceFunctionSpy).toHaveBeenCalled();
+    });
+  });
+
+  describe('retrievePreparation()', () => {
+    it('should return a preparation', async () => {
+      const serviceFunctionSpy = jest
+        .spyOn(service, 'findPreparationById')
+        .mockResolvedValueOnce(mockPreparationsList[0]);
+
+      expect(controller.retrievePreparation(mockPreparationIdParams)).resolves.toEqual(mockPreparationsList[0]);
+      expect(serviceFunctionSpy).toHaveBeenCalled();
+    });
+  });
+
+  describe('preparationIsServed()', () => {
+    it('should return a preparation', async () => {
+      const serviceFunctionSpy = jest
+        .spyOn(service, 'isTakenForService')
+        .mockResolvedValueOnce(mockPreparationsList[0]);
+
+      expect(controller.preparationIsServed(mockPreparationIdParams)).resolves.toEqual(mockPreparationsList[0]);
+      expect(serviceFunctionSpy).toHaveBeenCalled();
     });
   });
 });
