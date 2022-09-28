@@ -17,6 +17,8 @@ import { AddMenuItemDto } from '../dto/add-menu-item.dto.js';
 import { PreparationValidator } from '../validators/preparation.validator.js';
 import { PreparationLiteValidator } from '../validators/preparation-lite.validator.js';
 import { PreparedItemValidator } from '../validators/prepared-item.validator.js';
+import { PreparationWithoutRecipesValidator } from '../validators/preparation-without-recipes.validator.js';
+import { PreparedItemWithoutRecipesValidator } from '../validators/prepared-item-without-recipes.validator.js';
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
@@ -161,7 +163,7 @@ describe('Restaurant', () => {
       await frisby
         .get(`${kitchenBaseUrl}${kitchenServicePreparationsPath}?state=preparationStarted&tableNumber=${firstAvailableTable.number}`)
         .expect("status", 200)
-        .expect("jsonTypesStrict", "*", PreparationValidator)
+        .expect("jsonTypesStrict", "*", PreparationWithoutRecipesValidator)
         .then((res) => {
           preparationsFromKitchen = res.json;
           expect(preparationsFromKitchen.length).toEqual(2);
@@ -255,7 +257,7 @@ describe('Restaurant', () => {
         await frisby
           .post(`${kitchenBaseUrl}${kitchenServicePreparedItemsPath}/${preparedItem._id}/finish`)
           .expect("status", 200)
-          .expect("jsonTypesStrict", PreparedItemValidator);
+          .expect("jsonTypesStrict", PreparedItemWithoutRecipesValidator);
       }
       await frisby
         .get(`${kitchenBaseUrl}${kitchenServicePreparationsPath}?state=readyToBeServed&tableNumber=${firstAvailableTable.number}`)
@@ -280,7 +282,7 @@ describe('Restaurant', () => {
       await frisby
         .post(`${kitchenBaseUrl}${kitchenServicePreparationsPath}/${readyBarPreparation._id}/takenToTable`)
         .expect("status", 200)
-        .expect("jsonTypesStrict", PreparationValidator)
+        .expect("jsonTypesStrict", PreparationWithoutRecipesValidator)
         .then((res) => {
           expect(res.json.takenForServiceAt).not.toBeNull();
         });
@@ -309,7 +311,7 @@ describe('Restaurant', () => {
         await frisby
           .post(`${kitchenBaseUrl}${kitchenServicePreparedItemsPath}/${preparedItem._id}/finish`)
           .expect("status", 200)
-          .expect("jsonTypesStrict", PreparedItemValidator);
+          .expect("jsonTypesStrict", PreparedItemWithoutRecipesValidator);
       }
       await frisby
         .get(`${kitchenBaseUrl}${kitchenServicePreparationsPath}?state=readyToBeServed&tableNumber=${firstAvailableTable.number}`)
@@ -333,7 +335,7 @@ describe('Restaurant', () => {
       await frisby
         .post(`${kitchenBaseUrl}${kitchenServicePreparationsPath}/${readyHotDishesPreparation._id}/takenToTable`)
         .expect("status", 200)
-        .expect("jsonTypesStrict", PreparationValidator)
+        .expect("jsonTypesStrict", PreparationWithoutRecipesValidator)
         .then((res) => {
           expect(res.json.takenForServiceAt).not.toBeNull();
         });

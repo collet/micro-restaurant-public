@@ -1,5 +1,7 @@
 import { Joi } from '../config/config.js';
 
+import { PreparationLiteValidator } from './preparation-lite.validator.js';
+
 export const TableOrderValidator = Joi.object({
   _id: Joi.string().required(),
   tableNumber: Joi.number().required(),
@@ -14,6 +16,9 @@ export const TableOrderValidator = Joi.object({
       howMany: Joi.number().min(0).required(),
       sentForPreparation: Joi.boolean().required(),
     })
+  ),
+  preparations: Joi.array().items(
+    PreparationLiteValidator
   ),
   billed: Joi.string().isoDate().allow(null),
 });
