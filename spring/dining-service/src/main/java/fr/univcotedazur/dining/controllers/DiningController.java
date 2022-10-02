@@ -24,6 +24,7 @@ import java.util.UUID;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
+@CrossOrigin
 @RequestMapping(path = DiningController.BASE_URI, produces = APPLICATION_JSON_VALUE)
 public class DiningController {
 

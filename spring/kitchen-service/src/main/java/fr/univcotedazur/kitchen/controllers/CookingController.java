@@ -17,6 +17,7 @@ import java.util.UUID;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
+@CrossOrigin
 @RequestMapping(path = fr.univcotedazur.kitchen.controllers.CookingController.BASE_URI, produces = APPLICATION_JSON_VALUE)
 public class CookingController {
 

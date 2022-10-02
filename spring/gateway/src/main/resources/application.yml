@@ -1,6 +1,16 @@
 spring:
   cloud:
     gateway:
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedHeaders:
+              - content-type
+            allowedMethods:
+              - GET
+              - POST
+              - OPTIONS
       routes:
         - id: menu-service
           uri: http://menu-service:8080
