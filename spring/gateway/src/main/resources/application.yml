@@ -1,6 +1,16 @@
 spring:
   cloud:
     gateway:
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedHeaders:
+              - content-type
+            allowedMethods:
+              - GET
+              - POST
+              - OPTIONS
       routes:
         - id: menu-service
           uri: http://menu-service:8080
@@ -8,15 +18,30 @@ spring:
             - Path=/menu/**
           filters:
             - RewritePath=/menu(?<segment>/?.*), $\{segment}
+            - DedupeResponseHeader=Access-Control-Allow-Origin
         - id: dining-service
           uri: http://dining-service:8080
           predicates:
             - Path=/dining/**
           filters:
             - RewritePath=/dining(?<segment>/?.*), $\{segment}
+            - DedupeResponseHeader=Access-Control-Allow-Origin
         - id: kitchen-service
           uri: http://kitchen-service:8080
           predicates:
             - Path=/kitchen/**
           filters:
             - RewritePath=/kitchen(?<segment>/?.*), $\{segment}
+            - DedupeResponseHeader=Access-Control-Allow-Origin
+        - id: react-ui-waiter
+          uri: http://react-ui-waiter:5000
+          predicates:
+            - Path=/waiter/**
+          filters:
+            - RewritePath=/waiter(?<segment>/?.*), $\{segment}
+        - id: react-ui-ordering-kiosk
+          uri: http://react-ui-ordering-kiosk:5000
+          predicates:
+            - Path=/ordering-kiosk/**
+          filters:
+            - RewritePath=/ordering-kiosk(?<segment>/?.*), $\{segment}
