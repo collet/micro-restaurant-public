@@ -10,3 +10,9 @@ services:
       - ${MENU_SERVICE}
       - ${KITCHEN_SERVICE}
       - ${DINING_SERVICE}
+    networks:
+      - spring-restaurant-network
+
+networks:
+  spring-restaurant-network:
+    driver: bridge
