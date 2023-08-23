@@ -100,14 +100,7 @@ public class DiningRoom {
             OrderingLine line = new OrderingLine();
             line.setItem(item);
             line.setHowMany(howMany);
-            List<OrderingLine> lines = tableOrder.getLines();
-            if (lines == null) {
-                lines = new ArrayList<>();
-            }
-            // we don't try to merge lines on same items, as their can be "sent for preparation" at different moments
-            lines.add(line);
-            tableOrder.setLines(lines);
-            return tableOrderRepository.save(tableOrder);
+            return tableOrderRepository.addAndSaveTableOrderLine(tableOrder.getId(),line);
         }
     }
 
@@ -116,20 +109,13 @@ public class DiningRoom {
         List<Preparation> ongoingPreparations = kitchenProxy.sendCookingOrderToKitchen(orderLines.stream().
                 filter(line -> !line.isSentForPreparation()).toList(),
                 tableOrder.getTableNumber());
-        tableOrder.setLines(allLinesAsPrepared(orderLines));
         List<Preparation> previousPreparations = tableOrder.getPreparations();
         if (previousPreparations == null) {
             previousPreparations = new ArrayList<>();
         }
         previousPreparations.addAll(ongoingPreparations);
-        tableOrder.setPreparations(previousPreparations);
-        tableOrderRepository.save(tableOrder);
+        tableOrderRepository.sendForPrepAndSaveTableOrder(tableOrder.getId(), orderLines, previousPreparations);
         return ongoingPreparations;
-    }
-
-    private List<OrderingLine> allLinesAsPrepared(List<OrderingLine> input) {
-        input.forEach(line -> line.setSentForPreparation(true));
-        return input;
     }
 
 }

@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface TableOrderRepository extends MongoRepository<TableOrder, UUID> {
+public interface TableOrderRepository extends MongoRepository<TableOrder, UUID>, TableOrderRepositoryCustom {
 
     @Query(value = "{ 'tableNumber' : ?0 }") // We don't use Table, as a table object can be taken or not in the mongoDB collections
     List<TableOrder> findByTableNumber(Long tableNumber);
