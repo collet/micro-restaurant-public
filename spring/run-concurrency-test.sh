@@ -72,7 +72,8 @@ tickParse "$order"
 for line in ``lines.items()``; do
     printf "    - %s\n" "${!line}"
   done
-echo " ``lines.length()`` lines in the order"
+lineNumber=``lines.length()``
+echo $((lineNumber/4)) "lines in the order"
 ret_code=$?
 echo "Stopping the docker-compose gracefully"
 ./stop-all.sh
