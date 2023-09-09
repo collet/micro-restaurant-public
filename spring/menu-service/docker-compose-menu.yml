@@ -8,8 +8,16 @@ services:
       - 3000:8080
     depends_on:
       - mongo_db_menu
+    networks:
+      - spring-restaurant-network
   mongo_db_menu:
     image: ${MONGO_IMAGE}
     restart: always
     ports:
       - 27017:27017
+    networks:
+      - spring-restaurant-network
+
+networks:
+  spring-restaurant-network:
+    driver: bridge

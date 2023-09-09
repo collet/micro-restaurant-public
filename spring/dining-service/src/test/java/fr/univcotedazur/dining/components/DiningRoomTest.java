@@ -146,10 +146,11 @@ class DiningRoomTest {
         diningRoom.sendItemsForPreparation(returnedOrder);
         Table tableBeforeBilling = tableRepository.findByNumber(returnedOrder.getTableNumber()).get();
         assertThat(tableBeforeBilling.isTaken(), is(true));
-        returnedOrder = diningRoom.billOrderOnTable(returnedOrder);
-        assertNotNull(returnedOrder.getBilled());
-        assertThat(returnedOrder.getLines().get(0).isSentForPreparation(),equalTo(true));
-        Table tableAfterBilling = tableRepository.findByNumber(returnedOrder.getTableNumber()).get();
+        TableOrder updatedOrder = tableOrderRepository.findById(returnedOrder.getId()).get();
+        updatedOrder = diningRoom.billOrderOnTable(updatedOrder);
+        assertNotNull(updatedOrder.getBilled());
+        assertThat(updatedOrder.getLines().get(0).isSentForPreparation(),equalTo(true));
+        Table tableAfterBilling = tableRepository.findByNumber(updatedOrder.getTableNumber()).get();
         assertThat(tableAfterBilling.isTaken(), is(false));
     }
 

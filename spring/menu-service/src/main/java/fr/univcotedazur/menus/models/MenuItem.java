@@ -3,6 +3,7 @@ package fr.univcotedazur.menus.models;
 import org.springframework.data.annotation.Id;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.net.URL;
 import java.util.UUID;
@@ -21,10 +22,10 @@ public class MenuItem {
         @Positive
         private double price; // in euro
 
-        @NotBlank
+        @NotNull
         private Category category;
 
-        @NotBlank
+        @NotNull
         private URL image;
 
         public UUID getId() {

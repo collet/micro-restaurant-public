@@ -3,7 +3,7 @@
 function run_test_with_profile() { # $1 the maven profile to run tests with
   echo "Starting the full docker-compose in background"
   ./start-all.sh
-  echo "Running integration-tests with maven with direct access to backend microservices"
+  echo "Running integration-tests with maven"
   cd integration-tests
   mvn clean test -P $1
   ret_code=$?

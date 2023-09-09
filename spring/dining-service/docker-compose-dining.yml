@@ -13,8 +13,16 @@ services:
     environment:
       - MENU_WITH_PORT=${MENU_SERVICE}:8080
       - KITCHEN_WITH_PORT=${KITCHEN_SERVICE}:8080
+    networks:
+      - spring-restaurant-network
   mongo_db_dining:
     image: ${MONGO_IMAGE}
     restart: always
     ports:
       - 27018:27017
+    networks:
+      - spring-restaurant-network
+
+networks:
+  spring-restaurant-network:
+    driver: bridge
