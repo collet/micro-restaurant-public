@@ -57,7 +57,8 @@ public class DiningRoom {
             throw new TableNotTakenException(table.getNumber());
         } else {
             return tableOrderRepository.findOpenTableOrders().stream()
-                    .filter(tOrder -> tOrder.getBilled() == null).findFirst().get();
+                    .filter(tOrder -> tOrder.getTableNumber().equals(table.getNumber()) &&
+                                      tOrder.getBilled() == null).findFirst().get();
         }
     }
 

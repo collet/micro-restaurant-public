@@ -22,8 +22,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
@@ -54,6 +53,9 @@ class DiningRoomTest {
 
     @Autowired
     DiningRoom diningRoom;
+
+    @Autowired
+    TablesLayout tablesLayout;
 
     @MockBean
     KitchenProxy mockedKitchenProxy;
@@ -105,6 +107,18 @@ class DiningRoomTest {
     @Test
     void cannotStartOrderingOnTakenTable() throws Exception  {
         assertThrows(TableAlreadyTakenException.class, () -> diningRoom.startOrderingOnTable(table1,5));
+    }
+
+    @Test
+    void giveCorrectTableOrderId() throws Exception {
+        Table table2 = tablesLayout.addTable(2L);
+        Table table3 = tablesLayout.addTable(3L);
+        TableOrder order2 = diningRoom.startOrderingOnTable(table2,4);
+        TableOrder order3 = diningRoom.startOrderingOnTable(table3,6);
+        assertThat(diningRoom.currentTableOrderOnTable(table1).getId(),not(equalTo(order2.getId())));
+        assertThat(diningRoom.currentTableOrderOnTable(table1).getId(),not(equalTo(order3.getId())));
+        assertThat(diningRoom.currentTableOrderOnTable(table2).getId(),equalTo(order2.getId()));
+        assertThat(diningRoom.currentTableOrderOnTable(table3).getId(),equalTo(order3.getId()));
     }
 
     @Test
